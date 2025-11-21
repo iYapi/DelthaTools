@@ -1,0 +1,15 @@
+from . import eye_glow_setup
+
+modules = [
+    eye_glow_setup
+]
+
+
+def register():
+    for item in modules:
+        item.register()
+
+
+def unregister():
+    for item in modules:
+        item.unregister()

@@ -1,9 +1,10 @@
-from . import LightingProperties, LightingSetup, GraphNewWindow
+from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing
 
 modules = [
     LightingProperties,
     LightingSetup,
-    GraphNewWindow
+    GraphNewWindow,
+    EyeGlowCompositing
 ]
 
 
