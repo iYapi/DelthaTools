@@ -2,6 +2,7 @@ import bpy
 
 from .LightingProperties import LightingPropertiesUI
 from .LightingSetup import LightingSetupUI
+from .EyeGlowCompositing import EyeGlowCompositingUI
 
 
 # ------------------------------------------------------------------------
@@ -37,12 +38,42 @@ class NAV_PT_Panel(bpy.types.Panel):
             LightingSetupUI(self.layout, context).draw()
 
 
+class NAV_PT_PanelCompositing(bpy.types.Panel):
+    bl_label = "MXTools Compositing"
+    bl_idname = "NAV_PT_panel_compositing"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'UI'
+    bl_category = 'MXTools'
+    bl_description = "Compositing panel for MasterX Tools"
+
+    def draw(self, context):
+        layout = self.layout
+        s = context.scene
+
+        # Top combobox
+        row = layout.row(align=True)
+        row.prop(s.toolbox_compositing, "ui_mode", text="Mode", expand=False)
+
+        layout.separator(factor=0.3)
+
+        if s.toolbox_compositing.ui_mode == 'INFO':
+            # Header: version + quick info
+            box = layout.box()
+            col = box.column(align=True)
+            col.label(text=f"Toolkit v{s.toolbox.version}", icon='INFO')
+            col.label(text="Maintainer: MrYapikZ")
+        elif s.toolbox_compositing.ui_mode == 'EYE_GLOW_COMPOSITING':
+            EyeGlowCompositingUI(self.layout, context).draw()
+
+
 # ------------------------------------------------------------------------
 # Register
 # ------------------------------------------------------------------------
 def register():
     bpy.utils.register_class(NAV_PT_Panel)
+    bpy.utils.register_class(NAV_PT_PanelCompositing)
 
 
 def unregister():
     bpy.utils.unregister_class(NAV_PT_Panel)
+    bpy.utils.unregister_class(NAV_PT_PanelCompositing)

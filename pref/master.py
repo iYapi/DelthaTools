@@ -21,12 +21,27 @@ class Toolbox(bpy.types.PropertyGroup):
         options={'HIDDEN'}
     )
 
+class ToolboxCompositing(bpy.types.PropertyGroup):
+    ui_mode: bpy.props.EnumProperty(
+        name="Mode",
+        description="Choose which tool page to display",
+        items=[
+            ('INFO', "Info", "Information about the addon"),
+            ('EYE_GLOW_COMPOSITING', "EyeGlowCompositing", "Eye glow compositing tools"),
+        ],
+        default='INFO',
+    )
+
 
 def register():
     bpy.utils.register_class(Toolbox)
+    bpy.utils.register_class(ToolboxCompositing)
     bpy.types.Scene.toolbox = bpy.props.PointerProperty(type=Toolbox)
+    bpy.types.Scene.toolbox_compositing = bpy.props.PointerProperty(type=ToolboxCompositing)
 
 
 def unregister():
     bpy.utils.unregister_class(Toolbox)
+    bpy.utils.unregister_class(ToolboxCompositing)
     del bpy.types.Scene.toolbox
+    del bpy.types.Scene.toolbox_compositing
