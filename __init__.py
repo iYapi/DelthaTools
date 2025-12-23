@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "MXTools",
+    "name": "ExToolbox",
     "description": "Tools for Blender",
     "author": "MrYapikZ",
     "version": (0, 1, 13),

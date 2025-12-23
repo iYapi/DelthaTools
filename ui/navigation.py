@@ -10,11 +10,11 @@ from .AnimPlayblast import AnimPlayblastUI
 # Navigation Panel Properties
 # ------------------------------------------------------------------------
 class NAV_PT_Panel(bpy.types.Panel):
-    bl_label = "MXTools"
-    bl_idname = "NAV_PT_panel"
+    bl_label = "ExToolbox"
+    bl_idname = "EXTOOLBOX_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'MXTools'
+    bl_category = 'ExToolbox'
     bl_description = "Navigation panel for MasterX Tools"
 
     def draw(self, context):
@@ -31,7 +31,7 @@ class NAV_PT_Panel(bpy.types.Panel):
             # Header: version + quick info
             box = layout.box()
             col = box.column(align=True)
-            col.label(text=f"Toolkit v{s.toolbox.version}", icon='INFO')
+            col.label(text=f"ExToolbox v{s.toolbox.version}", icon='INFO')
             col.label(text="Maintainer: MrYapikZ")
         elif s.toolbox.ui_mode == 'LIGHTING_PROPERTIES':
             LightingPropertiesUI(self.layout, context).draw()
@@ -42,11 +42,11 @@ class NAV_PT_Panel(bpy.types.Panel):
 
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
-    bl_label = "MXTools Compositing"
-    bl_idname = "NAV_PT_panel_compositing"
+    bl_label = "ExToolbox"
+    bl_idname = "EXTOOLBOX_PT_panel_compositing"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'MXTools'
+    bl_category = 'ExToolbox'
     bl_description = "Compositing panel for MasterX Tools"
 
     def draw(self, context):
@@ -63,7 +63,7 @@ class NAV_PT_PanelCompositing(bpy.types.Panel):
             # Header: version + quick info
             box = layout.box()
             col = box.column(align=True)
-            col.label(text=f"Toolkit v{s.toolbox.version}", icon='INFO')
+            col.label(text=f"ExToolbox v{s.toolbox.version}", icon='INFO')
             col.label(text="Maintainer: MrYapikZ")
         elif s.toolbox_compositing.ui_mode == 'EYE_GLOW_COMPOSITING':
             EyeGlowCompositingUI(self.layout, context).draw()
