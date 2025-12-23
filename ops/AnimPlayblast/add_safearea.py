@@ -1,0 +1,50 @@
+import bpy
+
+
+# ------------------------------------------------------------------------
+# Add Safe Area - Operator
+# ------------------------------------------------------------------------
+class APB_OT_AddSafeArea(bpy.types.Operator):
+    bl_idname = "apb.add_safe_area"
+    bl_label = "Add Safe Area"
+    bl_description = "Add a safe area overlay to the active camera"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        cam = context.scene.camera
+        if cam is None:
+            cams = [obj for obj in bpy.data.objects if obj.type == 'CAMERA']
+            cam = cams[0] if cams else None
+
+        if cam and cam.type == 'CAMERA':
+            cam.data.show_background_images = True
+
+            if not cam.data.background_images:
+                cam.data.background_images.new()
+
+            bg = cam.data.background_images[0]
+
+            img_path = "/mnt/J/00_tools/cam_guide/action-safe_nowm.png"
+            if not bpy.data.images.get("action-safe_nowm.png"):
+                bg.image = bpy.data.images.load(img_path)
+            else:
+                bg.image = bpy.data.images["action-safe_nowm.png"]
+
+            bg.image.colorspace_settings.name = 'Linear ACES - AP0'
+            bg.display_depth = 'FRONT'
+            bg.scale = 1.12
+            bg.alpha = 1.0
+
+            self.report({'INFO'}, f"Safe area added to camera '{cam.name}'")
+        else:
+            self.report({'WARNING'}, "No camera found")
+
+        return {'FINISHED'}
+
+
+def register():
+    bpy.utils.register_class(APB_OT_AddSafeArea)
+
+
+def unregister():
+    bpy.utils.unregister_class(APB_OT_AddSafeArea)

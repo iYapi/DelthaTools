@@ -12,12 +12,18 @@ class Toolbox(bpy.types.PropertyGroup):
             ('INFO', "Info", "Information about the addon"),
             ('LIGHTING_PROPERTIES', "LightingProperties", "Lighting override controls"),
             ('LIGHTING_SETUP', "LightingSetup", "Lighting setup tools"),
+            ('ANIM_PLAYBLAST', "AnimPlayblast", "Animation playblast tools"),
         ],
         default='INFO',
     )
+    json_config: bpy.props.StringProperty(
+        name="JSON Config Path",
+        default="/mnt/A/config_script/toolbox_config.json",
+        subtype='FILE_PATH',
+    )
     version: bpy.props.StringProperty(
         name="Version",
-        default="0.1.12",
+        default="0.1.13",
         options={'HIDDEN'}
     )
 
