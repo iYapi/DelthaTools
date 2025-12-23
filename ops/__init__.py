@@ -1,10 +1,11 @@
-from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing
+from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing, AnimPlayblast
 
 modules = [
     LightingProperties,
     LightingSetup,
     GraphNewWindow,
-    EyeGlowCompositing
+    EyeGlowCompositing,
+    AnimPlayblast
 ]
 
 

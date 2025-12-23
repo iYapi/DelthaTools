@@ -3,6 +3,7 @@ import bpy
 from .LightingProperties import LightingPropertiesUI
 from .LightingSetup import LightingSetupUI
 from .EyeGlowCompositing import EyeGlowCompositingUI
+from .AnimPlayblast import AnimPlayblastUI
 
 
 # ------------------------------------------------------------------------
@@ -36,6 +37,8 @@ class NAV_PT_Panel(bpy.types.Panel):
             LightingPropertiesUI(self.layout, context).draw()
         elif s.toolbox.ui_mode == 'LIGHTING_SETUP':
             LightingSetupUI(self.layout, context).draw()
+        elif s.toolbox.ui_mode == 'ANIM_PLAYBLAST':
+            AnimPlayblastUI(self.layout, context).draw()
 
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
