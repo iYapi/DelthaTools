@@ -17,9 +17,9 @@ class APB_OT_Render(bpy.types.Operator):
         end_frame = original_end
 
         for marker in bpy.context.scene.timeline_markers:
-            if marker.name == "render_start":
+            if marker.name == "EX_START":
                 start_frame = marker.frame
-            elif marker.name == "render_end":
+            elif marker.name == "EX_END":
                 end_frame = marker.frame
 
         bpy.context.scene.frame_start = start_frame
