@@ -97,7 +97,8 @@ class APB_OT_ApplyPreset(bpy.types.Operator):
 
         print(parts)
         ## TODO: fix path preset
-        dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{int(parts[1][1:])}/ANM"
+        letter = "".join(c for c in parts[-1] if c.isalpha())
+        dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
         final_path = os.path.join(dir_path, f"{name}.mov")
         s.render.filepath = final_path
 
