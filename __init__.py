@@ -2,7 +2,7 @@ bl_info = {
     "name": "ExToolbox",
     "description": "Tools for Blender",
     "author": "MrYapikZ",
-    "version": (0, 1, 13),
+    "version": (0, 1, 14),
     "blender": (4, 5, 0),
 }
 
