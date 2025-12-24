@@ -30,7 +30,15 @@ class APB_OT_AddSafeArea(bpy.types.Operator):
             else:
                 bg.image = bpy.data.images["action-safe_nowm.png"]
 
-            bg.image.colorspace_settings.name = 'Linear ACES - AP0'
+            cs = bg.image.colorspace_settings
+            color_spaces = {e.identifier for e in cs.bl_rna.properties['name'].enum_items}
+
+            if 'Linear ACES - AP0' in color_spaces:
+                cs.name = 'Linear ACES - AP0'
+            elif 'Linear CIE-XYZ D65' in color_spaces:
+                cs.name = 'Linear CIE-XYZ D65'
+            else:
+                cs.name = 'sRGB'
             bg.display_depth = 'FRONT'
             bg.scale = 1.12
             bg.alpha = 1.0
