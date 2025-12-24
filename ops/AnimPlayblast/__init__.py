@@ -1,10 +1,11 @@
-from . import add_safearea, apply_preset, render_playblast, control_camera
+from . import add_safearea, apply_preset, render_playblast, control_camera, render_marker
 
 modules = [
     control_camera,
     add_safearea,
     apply_preset,
-    render_playblast
+    render_playblast,
+    render_marker,
 ]
 
 
