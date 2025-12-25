@@ -2,6 +2,8 @@ import bpy
 import json
 import os
 from ...utils.file_manager import FileManager
+from ...utils.config_manager import ConfigManager
+from ...utils.path_analyzer import PathAnalyzer
 
 # ------------------------------------------------------------------------
 # Helper Functions
@@ -96,11 +98,61 @@ class APB_OT_ApplyPreset(bpy.types.Operator):
         parts = [part for part in name.split("_") if part.strip()]
 
         print(parts)
-        ## TODO: fix path preset
-        letter = "".join(c for c in parts[-1] if c.isalpha())
-        dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
-        final_path = os.path.join(dir_path, f"{name}.mov")
-        s.render.filepath = final_path
+        
+        # Get Animation pattern to extract variables from blend file path
+        animation_pattern = ConfigManager.get_current_project_pattern("Animation")
+        # Get Playblast pattern to build output path
+        playblast_pattern = ConfigManager.get_current_project_pattern("Playblast")
+        
+        if animation_pattern and playblast_pattern:
+            # Get the full blend file path
+            blend_path = bpy.data.filepath
+            
+            if blend_path:
+                try:
+                    # Step 1: Extract variables from Animation pattern
+                    analyzer = PathAnalyzer()
+                    analyzer.load_from_dict({"patterns": {"Animation": animation_pattern, "Playblast": playblast_pattern}})
+                    
+                    variables = analyzer.extract_variables(blend_path, "Animation")
+                    print(f"Extracted variables from Animation pattern: {variables}")
+                    
+                    # Step 2: Build output path using Playblast pattern with extracted variables
+                    output_path = analyzer.build_path("Playblast", variables)
+                    
+                    # Ensure it has .mov extension
+                    output_path = os.path.splitext(output_path)[0] + ".mov"
+                    
+                    s.render.filepath = output_path
+                    print(f"Playblast output path: {output_path}")
+                    
+                except Exception as e:
+                    print(f"Error building path from patterns: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Fall back to old method
+                    letter = "".join(c for c in parts[-1] if c.isalpha())
+                    dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
+                    final_path = os.path.join(dir_path, f"{name}.mov")
+                    s.render.filepath = final_path
+            else:
+                print("Blend file not saved, cannot extract path variables")
+                # Fall back to old method
+                letter = "".join(c for c in parts[-1] if c.isalpha())
+                dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
+                final_path = os.path.join(dir_path, f"{name}.mov")
+                s.render.filepath = final_path
+        else:
+            if not animation_pattern:
+                print("Animation pattern not found in ExConfig")
+            if not playblast_pattern:
+                print("Playblast pattern not found in ExConfig")
+            print("Using fallback method for output path")
+            # Fall back to old method
+            letter = "".join(c for c in parts[-1] if c.isalpha())
+            dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
+            final_path = os.path.join(dir_path, f"{name}.mov")
+            s.render.filepath = final_path
 
         self.report({'INFO'}, f"Preset applied successfully!")
         return {'FINISHED'}
