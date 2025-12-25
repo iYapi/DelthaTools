@@ -63,13 +63,20 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
         # Check if config already exists to append or overwrite
         config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
         existing_projects = []
+        project_exists = False
         
-        # Load existing config if it exists and mode is APPEND
-        if exconfig.project_write_mode == 'APPEND' and os.path.exists(config_path):
+        # Load existing config if it exists
+        if os.path.exists(config_path):
             existing_config = JSONManager.load_json(config_path)
             if existing_config and "projects" in existing_config:
-                # Filter out project with same name to avoid duplicates
-                existing_projects = [p for p in existing_config["projects"] if p.get("name") != exconfig.project_name]
+                if exconfig.project_write_mode == 'APPEND':
+                    # In APPEND mode, keep all projects except the one with same name
+                    for p in existing_config["projects"]:
+                        if p.get("name") == exconfig.project_name:
+                            project_exists = True
+                        else:
+                            existing_projects.append(p)
+                # In OVERWRITE mode, existing_projects stays empty (replace entire file)
         
         # Create new project entry
         new_project = {
@@ -95,11 +102,23 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
         }
         
         # Save to config file
-        JSONManager.save_json(data, config_path)
+        try:
+            JSONManager.save_json(data, config_path)
+        except Exception as e:
+            self.report({'ERROR'}, f"Failed to save config: {str(e)}")
+            return {'CANCELLED'}
+        
+        # Report result
+        if exconfig.project_write_mode == 'OVERWRITE':
+            message = f"Config saved (OVERWRITE): {exconfig.project_name}"
+        elif project_exists:
+            message = f"Config updated: {exconfig.project_name}"
+        else:
+            message = f"Config added: {exconfig.project_name}"
         
         print(f"Config saved to: {config_path}")
         print(data)
-        self.report({'INFO'}, f"ExConfig saved to {config_path}")
+        self.report({'INFO'}, message)
         return {'FINISHED'}
 
 
