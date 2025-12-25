@@ -31,21 +31,17 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
             self.report({'ERROR'}, "Example path is required")
             return {'CANCELLED'}
 
-        # Determine pattern name: use custom name if provided, otherwise use division enum
-        if exconfig.project_pattern_name:
-            pattern_name = exconfig.project_pattern_name
-        else:
-            # Map enum value to label for pattern name
-            division_map = {
-                'NONE': 'None',
-                'ANIM': 'Animation',
-                'COMP': 'Compositing',
-                'PLAYBLAST': 'Playblast'
-            }
-            pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
+        # Use division enum to determine pattern name
+        division_map = {
+            'NONE': 'None',
+            'ANIM': 'Animation',
+            'COMP': 'Compositing',
+            'PLAYBLAST': 'Playblast'
+        }
+        pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
         
         if not pattern_name or pattern_name == 'None':
-            self.report({'ERROR'}, "Pattern name is required. Set a custom name or select a division.")
+            self.report({'ERROR'}, "Please select a pattern type (Animation, Compositing, or Playblast)")
             return {'CANCELLED'}
 
         # Create pattern using PathAnalyzer

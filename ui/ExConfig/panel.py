@@ -31,9 +31,6 @@ class ExConfig_PT_Panel(bpy.types.Panel):
         row.operator("exconfig.load_config_file", text="Browse", icon='FILE_FOLDER')
         
         col.separator()
-        
-        # Pattern name input for saving
-        col.prop(s.exconfig, "project_pattern_name", text="Pattern Name")
         col.operator("exconfig.generate_config", text="Save Settings", icon='FILE_TICK')
 
 

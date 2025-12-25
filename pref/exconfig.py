@@ -126,11 +126,6 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         description="Select pattern to load/save",
         items=get_pattern_items,
     )
-    project_pattern_name: bpy.props.StringProperty(
-        name="Pattern Name",
-        description="Name for the current pattern (used when saving)",
-        default="",
-    )
     
     def get_pattern_dict(self):
         """Get pattern data as dictionary"""

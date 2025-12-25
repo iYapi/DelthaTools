@@ -50,9 +50,6 @@ def load_project_data(exconfig, project_data, pattern_name=None):
             }
             exconfig.project_pattern_division = pattern_map.get(selected_pattern_name, 'NONE')
             
-            # Set the pattern name field
-            exconfig.project_pattern_name = selected_pattern_name
-            
             exconfig.project_pattern_base = pattern.get("base_path", "")
             exconfig.project_pattern_example = pattern.get("example_path", "")
             
