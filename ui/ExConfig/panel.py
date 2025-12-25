@@ -19,7 +19,8 @@ class ExConfig_PT_Panel(bpy.types.Panel):
         box = layout.box()
         col = box.column(align=True)
         col.label(text="ExConfig Settings.", icon='PREFERENCES')
-        col.operator("exconfig.load_settings", text="Load Settings", icon='FILE_FOLDER')
+        col.prop(s.exconfig, "project_list", text="Project")
+        col.operator("exconfig.load_config", text="Load Settings", icon='FILE_FOLDER')
         col.operator("exconfig.generate_config", text="Save Settings", icon='FILE_TICK')
 
 

@@ -1,7 +1,8 @@
-from . import generate_config
+from . import generate_config, load_config
 
 modules = [
     generate_config,
+    load_config,
 ]
 
 

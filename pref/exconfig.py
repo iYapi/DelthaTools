@@ -1,9 +1,36 @@
 import bpy
+import os
 
 
 # ------------------------------------------------------------------------
 # ExConfig Properties
 # ------------------------------------------------------------------------
+def get_project_items(self, context):
+    """Dynamic project list items"""
+    items = [('NONE', "None", "No project selected")]
+    
+    # Try to load projects from config file
+    config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+    if os.path.exists(config_path):
+        try:
+            import json
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            
+            if "projects" in config_data:
+                for project in config_data["projects"]:
+                    name = project.get("name", "")
+                    code = project.get("code", "")
+                    if name:
+                        # Use name as identifier and display
+                        desc = f"Project: {name}" + (f" ({code})" if code else "")
+                        items.append((name, name, desc))
+        except Exception as e:
+            print(f"Error loading project list: {e}")
+    
+    return items
+
+
 class ExConfigProperties(bpy.types.PropertyGroup):
     project_name: bpy.props.StringProperty(
         name="Project Name",
@@ -33,6 +60,10 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         ],
         default='NONE',
     )
+    project_pattern_name: bpy.props.StringProperty(
+        name="Name Pattern",
+        default="",
+    )
     project_pattern_base: bpy.props.StringProperty(
         name="Base Pattern",
         default="",
@@ -51,6 +82,11 @@ class ExConfigProperties(bpy.types.PropertyGroup):
             ('OVERWRITE', "Overwrite", "Overwrite existing files"),
         ],
         default='APPEND',
+    )
+    project_list: bpy.props.EnumProperty(
+        name="Project List",
+        description="Select from available projects",
+        items=get_project_items,
     )
 
 

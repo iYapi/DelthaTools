@@ -1,7 +1,6 @@
 import bpy
 import os
 from ...utils.path_analyzer import PathAnalyzer
-from ...utils.config_manager import ConfigManager
 from ...utils.json_manager import JSONManager
 from dataclasses import asdict
 
@@ -61,15 +60,46 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
         pattern_dict["full_pattern"] = analyzer.get_full_pattern_string(pattern.name)
 
         # Build the config structure matching config.example.json
-        config_manager = ConfigManager()
-        data = config_manager.get_project_dict_no_pattern(exconfig.project_name, exconfig.project_code,
-                                                          exconfig.project_drive_prod, exconfig.project_drive_output)
-        data["patterns"] = {pattern.name: pattern_dict}
-
+        # Check if config already exists to append or overwrite
         config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
-        JSONManager().save_json(data=data, filepath=config_path)
+        existing_projects = []
+        
+        # Load existing config if it exists and mode is APPEND
+        if exconfig.project_write_mode == 'APPEND' and os.path.exists(config_path):
+            existing_config = JSONManager.load_json(config_path)
+            if existing_config and "projects" in existing_config:
+                # Filter out project with same name to avoid duplicates
+                existing_projects = [p for p in existing_config["projects"] if p.get("name") != exconfig.project_name]
+        
+        # Create new project entry
+        new_project = {
+            "name": exconfig.project_name,
+            "code": exconfig.project_code if exconfig.project_code else "",
+            "path": {
+                "drive": {
+                    "production": exconfig.project_drive_prod if exconfig.project_drive_prod else "",
+                    "output": exconfig.project_drive_output if exconfig.project_drive_output else "",
+                },
+                "patterns": {
+                    pattern.name: pattern_dict
+                }
+            }
+        }
+        
+        # Add new project to list
+        existing_projects.append(new_project)
+        
+        # Build final config structure
+        data = {
+            "projects": existing_projects
+        }
+        
+        # Save to config file
+        JSONManager.save_json(data, config_path)
+        
+        print(f"Config saved to: {config_path}")
         print(data)
-        self.report({'INFO'}, "ExConfig generated successfully.")
+        self.report({'INFO'}, f"ExConfig saved to {config_path}")
         return {'FINISHED'}
 
 
