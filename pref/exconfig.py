@@ -33,10 +33,6 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         ],
         default='NONE',
     )
-    project_pattern_name: bpy.props.StringProperty(
-        name="Name Pattern",
-        default="",
-    )
     project_pattern_base: bpy.props.StringProperty(
         name="Base Pattern",
         default="",
@@ -46,6 +42,15 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         name="Example Pattern",
         default="",
         subtype='DIR_PATH',
+    )
+    project_write_mode: bpy.props.EnumProperty(
+        name="Write Mode",
+        description="Select the write mode for file operations",
+        items=[
+            ('APPEND', "Append", "Append to existing files"),
+            ('OVERWRITE', "Overwrite", "Overwrite existing files"),
+        ],
+        default='APPEND',
     )
 
 

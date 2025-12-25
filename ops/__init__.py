@@ -1,6 +1,7 @@
-from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing, AnimPlayblast
+from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing, AnimPlayblast, ExConfig
 
 modules = [
+    ExConfig,
     LightingProperties,
     LightingSetup,
     GraphNewWindow,

@@ -32,13 +32,13 @@
             "example_values": {
               "var_0": "03",
               "var_1": "animation",
-              "var_2": "ep102",
-              "var_3": "sq02",
-              "var_4": "sh0610",
+              "var_2": "ep999",
+              "var_3": "sq08",
+              "var_4": "sh0050",
               "var_5": "jgt",
               "var_6": "anm"
             },
-            "example_path": "/mnt/J/02_production/03_animation/ep102/ep102_sq02/ep102_sq02_sh0610/jgt_ep102_sq02_sh0610_anm.blend",
+            "example_path": "/mnt/J/02_production/03_animation/ep999/ep999_sq08/ep999_sq08_sh0050/jgt_ep999_sq08_sh0050_anm.blend",
             "full_pattern": "/mnt/J/02_production/{var_0}_{var_1}/{var_2}/{var_2}_{var_3}/{var_2}_{var_3}_{var_4}/{var_5}_{var_2}_{var_3}_{var_4}_{var_6}.blend"
           }
         }

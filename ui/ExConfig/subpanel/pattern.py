@@ -22,7 +22,6 @@ class ExConfigPatternUI(bpy.types.Panel):
         col = box.column(align=True)
         col.label(text="Pattern ExConfig.", icon='PREFERENCES')
         col.prop(s.exconfig, "project_pattern_division", text="Division")
-        col.prop(s.exconfig, "project_pattern_name", text="Name")
         col.prop(s.exconfig, "project_pattern_base", text="Base")
         col.prop(s.exconfig, "project_pattern_example", text="Example")
 
