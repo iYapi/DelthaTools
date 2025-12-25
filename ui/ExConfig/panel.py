@@ -21,11 +21,19 @@ class ExConfig_PT_Panel(bpy.types.Panel):
         col.label(text="ExConfig Settings.", icon='PREFERENCES')
         col.prop(s.exconfig, "project_list", text="Project")
         
+        # Show pattern selector if a project is selected
+        if s.exconfig.project_list != 'NONE':
+            col.prop(s.exconfig, "project_pattern_selected", text="Pattern")
+        
         # Split row for load buttons
         row = col.row(align=True)
         row.operator("exconfig.load_selected_project", text="Load Project", icon='IMPORT')
         row.operator("exconfig.load_config_file", text="Browse", icon='FILE_FOLDER')
         
+        col.separator()
+        
+        # Pattern name input for saving
+        col.prop(s.exconfig, "project_pattern_name", text="Pattern Name")
         col.operator("exconfig.generate_config", text="Save Settings", icon='FILE_TICK')
 
 

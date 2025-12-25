@@ -31,13 +31,22 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
             self.report({'ERROR'}, "Example path is required")
             return {'CANCELLED'}
 
-        # Map enum value to label for pattern name
-        division_map = {
-            'NONE': 'None',
-            'ANIM': 'Animation',
-            'COMP': 'Compositing'
-        }
-        pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
+        # Determine pattern name: use custom name if provided, otherwise use division enum
+        if exconfig.project_pattern_name:
+            pattern_name = exconfig.project_pattern_name
+        else:
+            # Map enum value to label for pattern name
+            division_map = {
+                'NONE': 'None',
+                'ANIM': 'Animation',
+                'COMP': 'Compositing',
+                'PLAYBLAST': 'Playblast'
+            }
+            pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
+        
+        if not pattern_name or pattern_name == 'None':
+            self.report({'ERROR'}, "Pattern name is required. Set a custom name or select a division.")
+            return {'CANCELLED'}
 
         # Create pattern using PathAnalyzer
         analyzer = PathAnalyzer()
@@ -67,21 +76,29 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
         config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
         existing_projects = []
         project_exists = False
+        existing_patterns = {}
         
         # Load existing config if it exists
         if os.path.exists(config_path):
             existing_config = JSONManager.load_json(config_path)
             if existing_config and "projects" in existing_config:
                 if exconfig.project_write_mode == 'APPEND':
-                    # In APPEND mode, keep all projects except the one with same name
+                    # In APPEND mode, keep all projects and merge patterns for matching project
                     for p in existing_config["projects"]:
                         if p.get("name") == exconfig.project_name:
                             project_exists = True
+                            # Save existing patterns to merge with new one
+                            existing_patterns = p.get("path", {}).get("patterns", {})
                         else:
+                            # Keep other projects as-is
                             existing_projects.append(p)
                 # In OVERWRITE mode, existing_projects stays empty (replace entire file)
         
-        # Create new project entry
+        # Merge new pattern with existing patterns
+        merged_patterns = existing_patterns.copy()
+        merged_patterns[pattern.name] = pattern_dict
+        
+        # Create new project entry with merged patterns
         new_project = {
             "name": exconfig.project_name,
             "code": exconfig.project_code if exconfig.project_code else "",
@@ -90,9 +107,7 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
                     "production": exconfig.project_drive_prod if exconfig.project_drive_prod else "",
                     "output": exconfig.project_drive_output if exconfig.project_drive_output else "",
                 },
-                "patterns": {
-                    pattern.name: pattern_dict
-                }
+                "patterns": merged_patterns
             }
         }
         
@@ -112,12 +127,13 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
             return {'CANCELLED'}
         
         # Report result
+        pattern_count = len(merged_patterns)
         if exconfig.project_write_mode == 'OVERWRITE':
-            message = f"Config saved (OVERWRITE): {exconfig.project_name}"
+            message = f"Config saved (OVERWRITE): {exconfig.project_name} with {pattern_count} pattern(s)"
         elif project_exists:
-            message = f"Config updated: {exconfig.project_name}"
+            message = f"Config updated: {exconfig.project_name} - Pattern '{pattern.name}' saved ({pattern_count} total)"
         else:
-            message = f"Config added: {exconfig.project_name}"
+            message = f"Config added: {exconfig.project_name} - Pattern '{pattern.name}' saved"
         
         print(f"Config saved to: {config_path}")
         print(data)

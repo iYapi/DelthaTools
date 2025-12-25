@@ -6,8 +6,14 @@ from ...utils.json_manager import JSONManager
 # ------------------------------------------------------------------------
 # Helper function to load project data into properties
 # ------------------------------------------------------------------------
-def load_project_data(exconfig, project_data):
-    """Load project data into ExConfig properties"""
+def load_project_data(exconfig, project_data, pattern_name=None):
+    """Load project data into ExConfig properties
+    
+    Args:
+        exconfig: ExConfig property group
+        project_data: Project dictionary from config
+        pattern_name: Optional specific pattern to load. If None, uses selected pattern or first available.
+    """
     # Load basic data
     exconfig.project_name = project_data.get("name", "")
     exconfig.project_code = project_data.get("code", "")
@@ -17,27 +23,45 @@ def load_project_data(exconfig, project_data):
     exconfig.project_drive_prod = drive_data.get("production", "")
     exconfig.project_drive_output = drive_data.get("output", "")
 
-    # Load pattern data (use first pattern found)
+    # Load pattern data
     patterns_data = project_data.get("path", {}).get("patterns", {})
     if patterns_data:
-        # Get first pattern
-        first_pattern_name = next(iter(patterns_data.keys()), None)
-        if first_pattern_name:
-            pattern = patterns_data[first_pattern_name]
+        # Determine which pattern to load
+        selected_pattern_name = pattern_name
+        
+        # If no pattern specified, try to use the selected pattern from UI
+        if not selected_pattern_name:
+            if exconfig.project_pattern_selected != 'NONE':
+                selected_pattern_name = exconfig.project_pattern_selected
+        
+        # If still no pattern, use first available
+        if not selected_pattern_name or selected_pattern_name not in patterns_data:
+            selected_pattern_name = next(iter(patterns_data.keys()), None)
+        
+        if selected_pattern_name and selected_pattern_name in patterns_data:
+            pattern = patterns_data[selected_pattern_name]
             
             # Map pattern name to enum
             pattern_map = {
                 'None': 'NONE',
                 'Animation': 'ANIM',
-                'Compositing': 'COMP'
+                'Compositing': 'COMP',
+                'Playblast': 'PLAYBLAST'
             }
-            exconfig.project_pattern_division = pattern_map.get(first_pattern_name, 'NONE')
+            exconfig.project_pattern_division = pattern_map.get(selected_pattern_name, 'NONE')
+            
+            # Set the pattern name field
+            exconfig.project_pattern_name = selected_pattern_name
             
             exconfig.project_pattern_base = pattern.get("base_path", "")
             exconfig.project_pattern_example = pattern.get("example_path", "")
             
             # Save full pattern data to preferences
             exconfig.set_pattern_dict(pattern)
+            
+            return selected_pattern_name
+    
+    return None
 
 
 # ------------------------------------------------------------------------
@@ -92,9 +116,12 @@ class EXCONFIG_OT_LoadConfigFile(bpy.types.Operator):
             selected_project = config_data["projects"][0]
 
         # Load project data into properties
-        load_project_data(exconfig, selected_project)
-
-        self.report({'INFO'}, f"Config loaded: {selected_project.get('name', 'Unknown')}")
+        pattern_name = load_project_data(exconfig, selected_project)
+        
+        message = f"Config loaded: {selected_project.get('name', 'Unknown')}"
+        if pattern_name:
+            message += f" - Pattern: {pattern_name}"
+        self.report({'INFO'}, message)
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -153,9 +180,12 @@ class EXCONFIG_OT_LoadSelectedProject(bpy.types.Operator):
             return {'CANCELLED'}
         
         # Load project data into properties
-        load_project_data(exconfig, selected_project)
+        pattern_name = load_project_data(exconfig, selected_project)
         
-        self.report({'INFO'}, f"Loaded project: {exconfig.project_list}")
+        message = f"Loaded project: {exconfig.project_list}"
+        if pattern_name:
+            message += f" - Pattern: {pattern_name}"
+        self.report({'INFO'}, message)
         return {'FINISHED'}
 
 

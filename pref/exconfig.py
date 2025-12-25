@@ -31,6 +31,37 @@ def get_project_items(self, context):
     return items
 
 
+def get_pattern_items(self, context):
+    """Dynamic pattern list items for selected project"""
+    items = [('NONE', "None", "No pattern selected")]
+    
+    # Get selected project
+    exconfig = context.scene.exconfig
+    selected_project = exconfig.project_list
+    
+    if selected_project == 'NONE':
+        return items
+    
+    # Try to load patterns from config file
+    config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            
+            if "projects" in config_data:
+                for project in config_data["projects"]:
+                    if project.get("name") == selected_project:
+                        patterns = project.get("path", {}).get("patterns", {})
+                        for pattern_name in patterns.keys():
+                            items.append((pattern_name, pattern_name, f"Pattern: {pattern_name}"))
+                        break
+        except Exception as e:
+            print(f"Error loading pattern list: {e}")
+    
+    return items
+
+
 class ExConfigProperties(bpy.types.PropertyGroup):
     project_name: bpy.props.StringProperty(
         name="Project Name",
@@ -89,6 +120,16 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         name="Project List",
         description="Select from available projects",
         items=get_project_items,
+    )
+    project_pattern_selected: bpy.props.EnumProperty(
+        name="Pattern Selection",
+        description="Select pattern to load/save",
+        items=get_pattern_items,
+    )
+    project_pattern_name: bpy.props.StringProperty(
+        name="Pattern Name",
+        description="Name for the current pattern (used when saving)",
+        default="",
     )
     
     def get_pattern_dict(self):
