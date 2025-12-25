@@ -1,10 +1,9 @@
-from . import master, exconfig, lighting_properties, lighting_setup
+from . import basic, drive, pattern
 
 modules = [
-    master,
-    exconfig,
-    lighting_properties,
-    lighting_setup,
+    basic,
+    drive,
+    pattern
 ]
 
 

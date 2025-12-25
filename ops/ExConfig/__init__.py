@@ -1,10 +1,8 @@
-from . import master, exconfig, lighting_properties, lighting_setup
+from . import generate_config, load_config
 
 modules = [
-    master,
-    exconfig,
-    lighting_properties,
-    lighting_setup,
+    generate_config,
+    load_config,
 ]
 
 
