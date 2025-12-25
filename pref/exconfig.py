@@ -57,6 +57,7 @@ class ExConfigProperties(bpy.types.PropertyGroup):
             ('NONE', "None", "Settings None"),
             ('ANIM', "Animation", "Settings Animation"),
             ('COMP', "Compositing", "Settings Compositing"),
+            ('PLAYBLAST', "Playblast", "Settings Playblast"),
         ],
         default='NONE',
     )

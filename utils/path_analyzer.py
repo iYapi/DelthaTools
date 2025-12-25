@@ -311,3 +311,120 @@ class PathAnalyzer:
             data["patterns"][name] = pattern_dict
         
         return data
+
+    def extract_variables(self, pattern_name: str, file_path: str) -> Optional[Dict[str, str]]:
+        """
+        Extract variable values from a file path using a pattern
+        
+        Args:
+            pattern_name: Name of the pattern to use
+            file_path: Full file path to extract variables from
+            
+        Returns:
+            Dictionary of variable names to values, or None if path doesn't match pattern
+            
+        Example:
+            pattern: "/base/{var_0}/{var_1}_{var_2}/{var_3}.blend"
+            path: "/base/animation/ep102_sq01/sh0100.blend"
+            returns: {"var_0": "animation", "var_1": "ep102", "var_2": "sq01", "var_3": "sh0100"}
+        """
+        import re
+        
+        pattern = self.get_pattern(pattern_name)
+        if not pattern:
+            raise ValueError(f"Pattern '{pattern_name}' not found")
+        
+        # Normalize the file path
+        file_path = os.path.normpath(file_path)
+        
+        # Build the full pattern string
+        pattern_parts = [pattern.base_path]
+        pattern_parts.extend(pattern.folder_patterns)
+        pattern_parts.append(pattern.filename_pattern + pattern.file_extension)
+        full_pattern = os.path.join(*pattern_parts)
+        
+        # Normalize the pattern path
+        full_pattern = os.path.normpath(full_pattern)
+        
+        # Convert pattern to regex
+        # Escape special regex characters except our placeholders
+        regex_pattern = re.escape(full_pattern)
+        
+        # Replace escaped placeholders with capture groups
+        # {var_0} becomes (?P<var_0>[^/\\]+)
+        for var_name in pattern.variable_names:
+            escaped_placeholder = re.escape(f"{{{var_name}}}")
+            # Match any character except path separators
+            regex_pattern = regex_pattern.replace(
+                escaped_placeholder, 
+                f"(?P<{var_name}>[^{re.escape(os.sep)}]+)"
+            )
+        
+        # Try to match the path
+        regex_pattern = f"^{regex_pattern}$"
+        match = re.match(regex_pattern, file_path)
+        
+        if not match:
+            return None
+        
+        # Extract all variables
+        variables = match.groupdict()
+        return variables
+
+    def extract_variables_from_dict(self, pattern_dict: Dict, file_path: str) -> Optional[Dict[str, str]]:
+        """
+        Extract variable values from a file path using a pattern dictionary
+        (doesn't require pattern to be loaded into PathAnalyzer)
+        
+        Args:
+            pattern_dict: Pattern dictionary (from get_pattern_dict())
+            file_path: Full file path to extract variables from
+            
+        Returns:
+            Dictionary of variable names to values, or None if path doesn't match pattern
+            
+        Example:
+            pattern_dict = exconfig.get_pattern_dict()
+            variables = analyzer.extract_variables_from_dict(pattern_dict, current_file_path)
+        """
+        import re
+        
+        # Normalize the file path
+        file_path = os.path.normpath(file_path)
+        
+        # Build the full pattern string
+        base_path = pattern_dict.get("base_path", "")
+        folder_patterns = pattern_dict.get("folder_patterns", [])
+        filename_pattern = pattern_dict.get("filename_pattern", "")
+        file_extension = pattern_dict.get("file_extension", "")
+        variable_names = pattern_dict.get("variable_names", [])
+        
+        pattern_parts = [base_path]
+        pattern_parts.extend(folder_patterns)
+        pattern_parts.append(filename_pattern + file_extension)
+        full_pattern = os.path.join(*pattern_parts)
+        
+        # Normalize the pattern path
+        full_pattern = os.path.normpath(full_pattern)
+        
+        # Convert pattern to regex
+        regex_pattern = re.escape(full_pattern)
+        
+        # Replace escaped placeholders with capture groups
+        for var_name in variable_names:
+            escaped_placeholder = re.escape(f"{{{var_name}}}")
+            regex_pattern = regex_pattern.replace(
+                escaped_placeholder, 
+                f"(?P<{var_name}>[^{re.escape(os.sep)}]+)"
+            )
+        
+        # Try to match the path
+        regex_pattern = f"^{regex_pattern}$"
+        match = re.match(regex_pattern, file_path)
+        
+        if not match:
+            return None
+        
+        # Extract all variables
+        variables = match.groupdict()
+        return variables

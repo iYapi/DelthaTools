@@ -11,8 +11,8 @@ class AnimPlayblastUI:
 
         column = layout.column(align=True)
         ## TODO: Select Project from prefs
-        # row.prop(pref_props, "project", text="Project")
-        column.label(text="Only work for BJL", icon='ERROR')
+        # column.label(text="Only work for BJL", icon='ERROR')
+        column.prop(s.exconfig, "project_list", text="Project")
         column.operator("apb.apply_preset", text="Apply Preset", icon='PRESET')
         column.operator("apb.render_playblast", text="Render Playblast", icon='RENDER_ANIMATION')
         column.operator("apb.add_safe_area", text="Add Safe Area", icon='VIEW_CAMERA')
