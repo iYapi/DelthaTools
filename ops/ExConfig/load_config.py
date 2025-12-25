@@ -35,6 +35,9 @@ def load_project_data(exconfig, project_data):
             
             exconfig.project_pattern_base = pattern.get("base_path", "")
             exconfig.project_pattern_example = pattern.get("example_path", "")
+            
+            # Save full pattern data to preferences
+            exconfig.set_pattern_dict(pattern)
 
 
 # ------------------------------------------------------------------------

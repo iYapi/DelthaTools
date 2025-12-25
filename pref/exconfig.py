@@ -1,5 +1,6 @@
 import bpy
 import os
+import json
 
 
 # ------------------------------------------------------------------------
@@ -13,7 +14,6 @@ def get_project_items(self, context):
     config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
     if os.path.exists(config_path):
         try:
-            import json
             with open(config_path, 'r', encoding='utf-8') as f:
                 config_data = json.load(f)
             
@@ -60,10 +60,6 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         ],
         default='NONE',
     )
-    project_pattern_name: bpy.props.StringProperty(
-        name="Name Pattern",
-        default="",
-    )
     project_pattern_base: bpy.props.StringProperty(
         name="Base Pattern",
         default="",
@@ -73,6 +69,11 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         name="Example Pattern",
         default="",
         subtype='DIR_PATH',
+    )
+    project_pattern_data: bpy.props.StringProperty(
+        name="Pattern Data",
+        description="JSON string containing the pattern data",
+        default="{}",
     )
     project_write_mode: bpy.props.EnumProperty(
         name="Write Mode",
@@ -88,6 +89,20 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         description="Select from available projects",
         items=get_project_items,
     )
+    
+    def get_pattern_dict(self):
+        """Get pattern data as dictionary"""
+        try:
+            return json.loads(self.project_pattern_data)
+        except:
+            return {}
+    
+    def set_pattern_dict(self, pattern_dict):
+        """Set pattern data from dictionary"""
+        try:
+            self.project_pattern_data = json.dumps(pattern_dict, ensure_ascii=False)
+        except Exception as e:
+            print(f"Error setting pattern data: {e}")
 
 
 def register():

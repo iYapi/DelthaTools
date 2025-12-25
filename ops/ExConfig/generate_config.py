@@ -58,6 +58,9 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
         # Add full_pattern
         analyzer.patterns[pattern.name] = pattern
         pattern_dict["full_pattern"] = analyzer.get_full_pattern_string(pattern.name)
+        
+        # Save pattern data to preferences as JSON string
+        exconfig.set_pattern_dict(pattern_dict)
 
         # Build the config structure matching config.example.json
         # Check if config already exists to append or overwrite
