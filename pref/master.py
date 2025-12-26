@@ -16,6 +16,11 @@ class Toolbox(bpy.types.PropertyGroup):
         ],
         default='INFO',
     )
+    show_exconfig: bpy.props.BoolProperty(
+        name="Show ExConfig Options",
+        description="Toggle to show or hide ExConfig related options",
+        default=False,
+    )
     json_config: bpy.props.StringProperty(
         name="JSON Config Path",
         default="/mnt/A/config_script/toolbox_config.json",

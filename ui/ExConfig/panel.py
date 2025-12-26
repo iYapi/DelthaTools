@@ -12,6 +12,10 @@ class ExConfig_PT_Panel(bpy.types.Panel):
     bl_category = 'ExToolbox'
     bl_description = "ExConfig panel for MasterX Tools"
 
+    @classmethod
+    def poll(cls, context):
+        return (context.scene.toolbox.show_exconfig)
+
     def draw(self, context):
         layout = self.layout
         s = context.scene

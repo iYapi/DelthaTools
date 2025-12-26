@@ -1,5 +1,6 @@
 import bpy
 from .GraphNewWindow import GraphNewWindowPrefUI
+from .ExConfig import ExConfigPrefUI
 
 try:
     # Prefer the constant from the root package if you defined it there
@@ -19,6 +20,8 @@ class AddOnPreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
 
+        # Draw the Ex Config preferences UI
+        ExConfigPrefUI(layout, context).draw()
         # Draw the Graph New Window preferences UI
         GraphNewWindowPrefUI(layout, context).draw()
 

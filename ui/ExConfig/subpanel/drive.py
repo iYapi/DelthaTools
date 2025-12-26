@@ -12,6 +12,7 @@ class ExConfigDriveUI(bpy.types.Panel):
     bl_category = 'ExToolbox'
     bl_description = "Drive ExConfig settings for MasterX Tools"
     bl_parent_id = "EXCONFIG_PT_panel"
+    bl_options = {'DEFAULT_CLOSED'}
     bl_order = 1
 
     def draw(self, context):
