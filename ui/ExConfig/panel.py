@@ -18,7 +18,12 @@ class ExConfig_PT_Panel(bpy.types.Panel):
 
         box = layout.box()
         col = box.column(align=True)
-        col.label(text="ExConfig Settings.", icon='PREFERENCES')
+        
+        # Header row with title and refresh button
+        row = col.row(align=True)
+        row.label(text="ExConfig Settings.", icon='PREFERENCES')
+        row.operator("exconfig.refresh_data", text="", icon='FILE_REFRESH')
+        
         col.prop(s.exconfig, "project_list", text="Project")
         
         # Show pattern selector if a project is selected
