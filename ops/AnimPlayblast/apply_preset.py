@@ -79,8 +79,20 @@ class APB_OT_ApplyPreset(bpy.types.Operator):
 
     def execute(self, context):
         s = context.scene
+        exconfig = s.exconfig
+        
+        # Get playblast config path from exconfig
+        json_path = exconfig.playblast_config
+        
+        if not json_path:
+            self.report({'ERROR'}, "No playblast config path set. Please set it in ExConfig > Playblast Config panel.")
+            return {'CANCELLED'}
+        
+        if not os.path.exists(json_path):
+            self.report({'ERROR'}, f"Playblast config file not found: {json_path}")
+            return {'CANCELLED'}
 
-        load_playblast_preset(context, json_path=s.toolbox.json_config, reporter=self.report)
+        load_playblast_preset(context, json_path=json_path, reporter=self.report)
 
         bpy.ops.apb.view_camera_operator()
 

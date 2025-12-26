@@ -1,10 +1,11 @@
-from . import basic, drive, pattern, pattern_match
+from . import basic, drive, pattern, pattern_match, playblast_config
 
 modules = [
     basic,
     drive,
     pattern,
-    pattern_match
+    pattern_match,
+    playblast_config
 ]
 
 

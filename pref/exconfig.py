@@ -62,6 +62,48 @@ def get_pattern_items(self, context):
     return items
 
 
+def on_project_list_update(self, context):
+    """Auto-load project data when project is selected from dropdown"""
+    if self.project_list == 'NONE':
+        return
+    
+    # Load config file from Blender config location
+    config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+    if not os.path.exists(config_path):
+        print("No config file found")
+        return
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        if "projects" not in config_data or not config_data["projects"]:
+            return
+        
+        # Find the selected project
+        selected_project = None
+        for project in config_data["projects"]:
+            if project.get("name") == self.project_list:
+                selected_project = project
+                break
+        
+        if not selected_project:
+            return
+        
+        # Import load_project_data function
+        from ..ops.ExConfig.load_config import load_project_data
+        
+        # Load project data
+        pattern_name = load_project_data(self, selected_project)
+        
+        print(f"Auto-loaded project: {self.project_list}")
+        if pattern_name:
+            print(f"  Pattern loaded: {pattern_name}")
+            
+    except Exception as e:
+        print(f"Error auto-loading project: {e}")
+
+
 class ExConfigProperties(bpy.types.PropertyGroup):
     project_name: bpy.props.StringProperty(
         name="Project Name",
@@ -120,6 +162,7 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         name="Project List",
         description="Select from available projects",
         items=get_project_items,
+        update=on_project_list_update,
     )
     project_pattern_selected: bpy.props.EnumProperty(
         name="Pattern Selection",
@@ -137,6 +180,14 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         name="Target Pattern",
         description="Target pattern (e.g., Playblast)",
         items=get_pattern_items,
+    )
+    
+    # Playblast config path
+    playblast_config: bpy.props.StringProperty(
+        name="Playblast Config",
+        description="Path to playblast preset JSON file",
+        default="",
+        subtype='FILE_PATH',
     )
     
     def get_pattern_dict(self):

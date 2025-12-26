@@ -19,6 +19,9 @@ def load_project_data(exconfig, project_data, pattern_name=None):
     exconfig.project_name = project_data.get("name", "")
     exconfig.project_code = project_data.get("code", "")
     
+    # Load playblast config path
+    exconfig.playblast_config = project_data.get("playblast_config", "")
+    
     # Load drive data
     drive_data = project_data.get("path", {}).get("drive", {})
     exconfig.project_drive_prod = drive_data.get("production", "")
