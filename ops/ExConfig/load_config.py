@@ -33,12 +33,7 @@ def load_project_data(exconfig, project_data, pattern_name=None):
         # Determine which pattern to load
         selected_pattern_name = pattern_name
         
-        # If no pattern specified, try to use the selected pattern from UI
-        if not selected_pattern_name:
-            if exconfig.project_pattern_selected != 'NONE':
-                selected_pattern_name = exconfig.project_pattern_selected
-        
-        # If still no pattern, use first available
+        # If no pattern specified, use first available
         if not selected_pattern_name or selected_pattern_name not in patterns_data:
             selected_pattern_name = next(iter(patterns_data.keys()), None)
         

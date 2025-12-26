@@ -104,6 +104,104 @@ def on_project_list_update(self, context):
         print(f"Error auto-loading project: {e}")
 
 
+def on_pattern_division_update(self, context):
+    """Auto-load pattern data when pattern division is selected"""
+    if self.project_pattern_division == 'NONE':
+        # Clear pattern fields
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        return
+    
+    # Check if project is selected
+    if self.project_list == 'NONE':
+        # No project selected, clear fields
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        return
+    
+    # Map division enum to pattern name
+    division_map = {
+        'NONE': 'None',
+        'ANIM': 'Animation',
+        'COMP': 'Compositing',
+        'PLAYBLAST': 'Playblast'
+    }
+    pattern_name = division_map.get(self.project_pattern_division)
+    
+    if not pattern_name or pattern_name == 'None':
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        return
+    
+    # Load config file
+    config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+    if not os.path.exists(config_path):
+        # No config file, clear fields
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        return
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        if "projects" not in config_data or not config_data["projects"]:
+            # No projects in config, clear fields
+            self.project_pattern_base = ""
+            self.project_pattern_example = ""
+            self.project_pattern_data = "{}"
+            return
+        
+        # Find the selected project
+        selected_project = None
+        for project in config_data["projects"]:
+            if project.get("name") == self.project_list:
+                selected_project = project
+                break
+        
+        if not selected_project:
+            # Project not found, clear fields
+            self.project_pattern_base = ""
+            self.project_pattern_example = ""
+            self.project_pattern_data = "{}"
+            return
+        
+        # Get patterns from project
+        patterns_data = selected_project.get("path", {}).get("patterns", {})
+        
+        if pattern_name not in patterns_data:
+            # Pattern not found, set empty strings (user can create new pattern)
+            self.project_pattern_base = ""
+            self.project_pattern_example = ""
+            self.project_pattern_data = "{}"
+            print(f"Pattern '{pattern_name}' not found - fields cleared for new pattern creation")
+            return
+        
+        # Load the selected pattern
+        pattern = patterns_data[pattern_name]
+        
+        self.project_pattern_base = pattern.get("base_path", "")
+        self.project_pattern_example = pattern.get("example_path", "")
+        
+        # Save full pattern data to preferences
+        self.set_pattern_dict(pattern)
+        
+        print(f"Auto-loaded pattern: {pattern_name}")
+        print(f"  Base: {self.project_pattern_base}")
+        print(f"  Example: {self.project_pattern_example}")
+        
+    except Exception as e:
+        # Error occurred, clear fields
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        print(f"Error auto-loading pattern: {e} - fields cleared")
+
+
 class ExConfigProperties(bpy.types.PropertyGroup):
     project_name: bpy.props.StringProperty(
         name="Project Name",
@@ -133,6 +231,7 @@ class ExConfigProperties(bpy.types.PropertyGroup):
             ('PLAYBLAST', "Playblast", "Settings Playblast"),
         ],
         default='NONE',
+        update=on_pattern_division_update,
     )
     project_pattern_base: bpy.props.StringProperty(
         name="Base Pattern",
@@ -163,11 +262,6 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         description="Select from available projects",
         items=get_project_items,
         update=on_project_list_update,
-    )
-    project_pattern_selected: bpy.props.EnumProperty(
-        name="Pattern Selection",
-        description="Select pattern to load/save",
-        items=get_pattern_items,
     )
     
     # Pattern matching properties

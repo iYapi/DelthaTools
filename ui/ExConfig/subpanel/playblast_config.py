@@ -5,7 +5,7 @@ import bpy
 # ExConfig Playblast Config
 # ------------------------------------------------------------------------
 class ExConfigPlayblastConfigUI(bpy.types.Panel):
-    bl_label = "Playblast Config"
+    bl_label = "ExConfig Playblast"
     bl_idname = "EXCONFIG_PLAYBLAST_CONFIG_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

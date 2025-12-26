@@ -30,10 +30,6 @@ class ExConfig_PT_Panel(bpy.types.Panel):
         
         col.prop(s.exconfig, "project_list", text="Project")
         
-        # Show pattern selector if a project is selected
-        if s.exconfig.project_list != 'NONE':
-            col.prop(s.exconfig, "project_pattern_selected", text="Pattern")
-        
         # Split row for load buttons
         row = col.row(align=True)
         row.operator("exconfig.load_selected_project", text="Load Project", icon='IMPORT')
