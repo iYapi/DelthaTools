@@ -65,6 +65,17 @@ def get_pattern_items(self, context):
 def on_project_list_update(self, context):
     """Auto-load project data when project is selected from dropdown"""
     if self.project_list == 'NONE':
+        # Clear all project-related fields
+        self.project_name = ""
+        self.project_code = ""
+        self.project_drive_prod = ""
+        self.project_drive_output = ""
+        self.project_pattern_division = 'NONE'
+        self.project_pattern_base = ""
+        self.project_pattern_example = ""
+        self.project_pattern_data = "{}"
+        self.playblast_config = ""
+        print("Project deselected - all fields cleared")
         return
     
     # Load config file from Blender config location
