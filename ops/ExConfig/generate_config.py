@@ -85,6 +85,9 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
                             project_exists = True
                             # Save existing patterns to merge with new one
                             existing_patterns = p.get("path", {}).get("patterns", {})
+                            # Preserve existing playblast_config if not changed
+                            if not exconfig.playblast_config and "playblast_config" in p:
+                                exconfig.playblast_config = p.get("playblast_config", "")
                         else:
                             # Keep other projects as-is
                             existing_projects.append(p)
@@ -106,6 +109,10 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
                 "patterns": merged_patterns
             }
         }
+        
+        # Add playblast_config if set
+        if exconfig.playblast_config:
+            new_project["playblast_config"] = exconfig.playblast_config
         
         # Add new project to list
         existing_projects.append(new_project)

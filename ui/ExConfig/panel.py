@@ -12,18 +12,23 @@ class ExConfig_PT_Panel(bpy.types.Panel):
     bl_category = 'ExToolbox'
     bl_description = "ExConfig panel for MasterX Tools"
 
+    @classmethod
+    def poll(cls, context):
+        return (context.scene.toolbox.show_exconfig)
+
     def draw(self, context):
         layout = self.layout
         s = context.scene
 
         box = layout.box()
         col = box.column(align=True)
-        col.label(text="ExConfig Settings.", icon='PREFERENCES')
-        col.prop(s.exconfig, "project_list", text="Project")
         
-        # Show pattern selector if a project is selected
-        if s.exconfig.project_list != 'NONE':
-            col.prop(s.exconfig, "project_pattern_selected", text="Pattern")
+        # Header row with title and refresh button
+        row = col.row(align=True)
+        row.label(text="ExConfig Settings.", icon='PREFERENCES')
+        row.operator("exconfig.refresh_data", text="", icon='FILE_REFRESH')
+        
+        col.prop(s.exconfig, "project_list", text="Project")
         
         # Split row for load buttons
         row = col.row(align=True)

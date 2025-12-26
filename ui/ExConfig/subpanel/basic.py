@@ -12,6 +12,7 @@ class ExConfigBasicUI(bpy.types.Panel):
     bl_category = 'ExToolbox'
     bl_description = "Basic ExConfig settings for MasterX Tools"
     bl_parent_id = "EXCONFIG_PT_panel"
+    bl_options = {'DEFAULT_CLOSED'}
     bl_order = 0
 
     def draw(self, context):
