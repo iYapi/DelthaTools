@@ -241,7 +241,7 @@ class ExConfigProperties(bpy.types.PropertyGroup):
     project_pattern_example: bpy.props.StringProperty(
         name="Example Pattern",
         default="",
-        subtype='DIR_PATH',
+        subtype='FILE_PATH',
     )
     project_pattern_data: bpy.props.StringProperty(
         name="Pattern Data",
