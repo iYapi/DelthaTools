@@ -114,3 +114,92 @@ class ConfigManager:
         except Exception as e:
             print(f"Error getting current project pattern: {e}")
             return None
+    
+    @staticmethod
+    def get_pattern_match(project_name: str, match_name: str) -> dict:
+        """
+        Get pattern match mapping from config.
+        
+        Args:
+            project_name: Name of the project
+            match_name: Name of the match (e.g., "animation_playblast")
+        
+        Returns:
+            dict: Pattern match mapping or None if not found
+            Example: {"var_0": "var_1", "var_1": "var_2"}
+        """
+        config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+        
+        if not os.path.exists(config_path):
+            print(f"Config file not found: {config_path}")
+            return None
+        
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            
+            if "projects" not in config_data:
+                return None
+            
+            for project in config_data["projects"]:
+                if project.get("name") == project_name:
+                    pattern_match = project.get("pattern_match", {})
+                    if match_name in pattern_match:
+                        return pattern_match[match_name]
+                    return None
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error loading pattern match: {e}")
+            return None
+    
+    @staticmethod
+    def save_pattern_match(project_name: str, match_name: str, mapping: dict) -> bool:
+        """
+        Save pattern match mapping to config.
+        
+        Args:
+            project_name: Name of the project
+            match_name: Name of the match (e.g., "animation_playblast")
+            mapping: Variable mapping dict (e.g., {"var_0": "var_1"})
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        config_path = os.path.join(bpy.utils.user_resource('CONFIG'), "exconfig.json")
+        
+        if not os.path.exists(config_path):
+            print(f"Config file not found: {config_path}")
+            return False
+        
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            
+            if "projects" not in config_data:
+                return False
+            
+            # Find and update the project
+            for project in config_data["projects"]:
+                if project.get("name") == project_name:
+                    # Initialize pattern_match if it doesn't exist
+                    if "pattern_match" not in project:
+                        project["pattern_match"] = {}
+                    
+                    # Save the mapping
+                    project["pattern_match"][match_name] = mapping
+                    
+                    # Write back to file
+                    with open(config_path, 'w', encoding='utf-8') as f:
+                        json.dump(config_data, f, indent=2, ensure_ascii=False)
+                    
+                    print(f"Pattern match '{match_name}' saved successfully")
+                    return True
+            
+            print(f"Project '{project_name}' not found")
+            return False
+            
+        except Exception as e:
+            print(f"Error saving pattern match: {e}")
+            return False

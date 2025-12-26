@@ -127,6 +127,18 @@ class ExConfigProperties(bpy.types.PropertyGroup):
         items=get_pattern_items,
     )
     
+    # Pattern matching properties
+    pattern_match_source: bpy.props.EnumProperty(
+        name="Source Pattern",
+        description="Source pattern (e.g., Animation)",
+        items=get_pattern_items,
+    )
+    pattern_match_target: bpy.props.EnumProperty(
+        name="Target Pattern",
+        description="Target pattern (e.g., Playblast)",
+        items=get_pattern_items,
+    )
+    
     def get_pattern_dict(self):
         """Get pattern data as dictionary"""
         try:

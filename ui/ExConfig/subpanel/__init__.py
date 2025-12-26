@@ -1,9 +1,10 @@
-from . import basic, drive, pattern
+from . import basic, drive, pattern, pattern_match
 
 modules = [
     basic,
     drive,
-    pattern
+    pattern,
+    pattern_match
 ]
 
 
