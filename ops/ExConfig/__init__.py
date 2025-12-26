@@ -1,8 +1,9 @@
-from . import generate_config, load_config
+from . import generate_config, load_config, pattern_match
 
 modules = [
     generate_config,
     load_config,
+    pattern_match,
 ]
 
 

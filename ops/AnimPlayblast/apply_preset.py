@@ -97,7 +97,9 @@ class APB_OT_ApplyPreset(bpy.types.Operator):
         s.render.stamp_note_text = name
         parts = [part for part in name.split("_") if part.strip()]
 
-        print(parts)
+        print("=" * 60)
+        print("AnimPlayblast - Generating Output Path")
+        print("=" * 60)
         
         # Get Animation pattern to extract variables from blend file path
         animation_pattern = ConfigManager.get_current_project_pattern("Animation")
@@ -114,45 +116,70 @@ class APB_OT_ApplyPreset(bpy.types.Operator):
                     analyzer = PathAnalyzer()
                     analyzer.load_from_dict({"patterns": {"Animation": animation_pattern, "Playblast": playblast_pattern}})
                     
-                    variables = analyzer.extract_variables(blend_path, "Animation")
+                    print(f"Blend file path: {blend_path}")
+                    variables = analyzer.extract_variables("Animation", blend_path)
                     print(f"Extracted variables from Animation pattern: {variables}")
                     
-                    # Step 2: Build output path using Playblast pattern with extracted variables
-                    output_path = analyzer.build_path("Playblast", variables)
+                    # Step 2: Get pattern match if available
+                    exconfig = s.exconfig
+                    project_name = exconfig.project_list
+                    match_name = "animation_playblast"
+                    pattern_match = ConfigManager.get_pattern_match(project_name, match_name)
                     
-                    # Ensure it has .mov extension
-                    output_path = os.path.splitext(output_path)[0] + ".mov"
+                    # Step 3: Build output path using Playblast pattern with pattern matching
+                    if pattern_match:
+                        print(f"Using pattern match '{match_name}': {pattern_match}")
+                        pattern_matches = {match_name: pattern_match}
+                        output_path = analyzer.build_path("Playblast", variables, match=match_name, pattern_matches=pattern_matches)
+                        print(f"Built path with pattern matching")
+                    else:
+                        print("WARNING: No pattern match found!")
+                        print("Please create pattern match in ExConfig > Pattern Match panel")
+                        print("Using direct variable mapping (may not work correctly)")
+                        output_path = analyzer.build_path("Playblast", variables)
+                    
+                    # Check if output path already has correct extension
+                    playblast_ext = playblast_pattern.get("file_extension", ".mov")
+                    if not output_path.endswith(playblast_ext):
+                        # Ensure it has correct extension
+                        output_path = os.path.splitext(output_path)[0] + playblast_ext
                     
                     s.render.filepath = output_path
-                    print(f"Playblast output path: {output_path}")
+                    print(f"✓ Playblast output path: {output_path}")
+                    print("=" * 60)
                     
                 except Exception as e:
                     print(f"Error building path from patterns: {e}")
                     import traceback
                     traceback.print_exc()
-                    # Fall back to old method
-                    letter = "".join(c for c in parts[-1] if c.isalpha())
-                    dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
-                    final_path = os.path.join(dir_path, f"{name}.mov")
-                    s.render.filepath = final_path
+                    print("=" * 60)
+                    print("ERROR: Failed to generate playblast output path")
+                    print("Please check your ExConfig pattern configuration:")
+                    print("  1. Ensure Animation pattern is correctly configured")
+                    print("  2. Ensure Playblast pattern is correctly configured")
+                    print("  3. Generate pattern match in ExConfig > Pattern Match panel")
+                    print("=" * 60)
+                    self.report({'ERROR'}, "Failed to generate output path. Check console for details.")
+                    return {'CANCELLED'}
             else:
-                print("Blend file not saved, cannot extract path variables")
-                # Fall back to old method
-                letter = "".join(c for c in parts[-1] if c.isalpha())
-                dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
-                final_path = os.path.join(dir_path, f"{name}.mov")
-                s.render.filepath = final_path
+                print("=" * 60)
+                print("ERROR: Blend file not saved")
+                print("Please save the blend file before using AnimPlayblast")
+                print("The Animation pattern needs a file path to extract variables from")
+                print("=" * 60)
+                self.report({'ERROR'}, "Blend file not saved. Save the file first.")
+                return {'CANCELLED'}
         else:
+            print("=" * 60)
+            print("ERROR: Required patterns not configured in ExConfig")
             if not animation_pattern:
-                print("Animation pattern not found in ExConfig")
+                print("  - Animation pattern not found")
             if not playblast_pattern:
-                print("Playblast pattern not found in ExConfig")
-            print("Using fallback method for output path")
-            # Fall back to old method
-            letter = "".join(c for c in parts[-1] if c.isalpha())
-            dir_path = f"/mnt/A/Output/Playblast/{parts[0]}_0{parts[1][1:]}/{letter}"
-            final_path = os.path.join(dir_path, f"{name}.mov")
-            s.render.filepath = final_path
+                print("  - Playblast pattern not found")
+            print("Please configure both patterns in ExConfig panel")
+            print("=" * 60)
+            self.report({'ERROR'}, "Animation and/or Playblast patterns not configured.")
+            return {'CANCELLED'}
 
         self.report({'INFO'}, f"Preset applied successfully!")
         return {'FINISHED'}

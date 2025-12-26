@@ -190,15 +190,55 @@ class PathAnalyzer:
         """Get a pattern by name"""
         return self.patterns.get(pattern_name)
 
-    def build_path(self, pattern_name: str, variables: Optional[Dict[str, str]] = None) -> str:
+    def build_path(self, pattern_name: str, variables: Optional[Dict[str, str]] = None, match: Optional[str] = None, pattern_matches: Optional[Dict[str, Dict[str, str]]] = None) -> str:
         """
         Build a path from pattern using provided variables
-        If variables not provided, use example values
+        
+        Args:
+            pattern_name: Name of the pattern to build
+            variables: Variable values to use
+            match: Optional match name (e.g., "animation_playblast") to remap variables
+            pattern_matches: Optional pattern match dictionary (e.g., {"animation_playblast": {"var_0": "var_1"}})
+        
+        Returns:
+            Built path string
+            
+        Example:
+            # Without matching
+            build_path("Playblast", {"var_0": "03", "var_1": "010"})
+            
+            # With matching (remaps animation vars to playblast vars)
+            build_path("Playblast", {"var_1": "03", "var_2": "010"}, 
+                       match="animation_playblast",
+                       pattern_matches={"animation_playblast": {"var_0": "var_1", "var_1": "var_2"}})
         """
         pattern = self.get_pattern(pattern_name)
         if not pattern:
             raise ValueError(f"Pattern '{pattern_name}' not found")
 
+        # If match is specified, remap variables
+        if match and pattern_matches and match in pattern_matches:
+            mapping = pattern_matches[match]
+            remapped_vars = {}
+            
+            # Remap: left side is target pattern var, right side is either:
+            #   - A source pattern variable name (e.g., "var_1")
+            #   - A static string value (e.g., "playblast")
+            # E.g., {"var_0": "var_1"} means playblast.var_0 = animation.var_1
+            # E.g., {"var_6": "playblast"} means playblast.var_6 = "playblast" (static)
+            if variables:
+                for target_var, source_var in mapping.items():
+                    if source_var in variables:
+                        # It's a source variable name, use its value
+                        remapped_vars[target_var] = variables[source_var]
+                        print(f"Mapping {target_var} from source variable {source_var}: {variables[source_var]}")
+                    else:
+                        # It's a static string value, use it directly
+                        remapped_vars[target_var] = source_var
+                        print(f"Using static value for {target_var}: '{source_var}'")
+                
+                variables = remapped_vars
+        
         if variables is None:
             variables = pattern.example_values
 
@@ -350,15 +390,38 @@ class PathAnalyzer:
         # Escape special regex characters except our placeholders
         regex_pattern = re.escape(full_pattern)
         
+        # Track which variables we've already seen and their capture group indices
+        var_group_map = {}  # {var_name: [group_index1, group_index2, ...]}
+        group_counter = 1
+        
         # Replace escaped placeholders with capture groups
-        # {var_0} becomes (?P<var_0>[^/\\]+)
+        # Use named groups for first occurrence, non-capturing groups for duplicates
         for var_name in pattern.variable_names:
             escaped_placeholder = re.escape(f"{{{var_name}}}")
-            # Match any character except path separators
-            regex_pattern = regex_pattern.replace(
-                escaped_placeholder, 
-                f"(?P<{var_name}>[^{re.escape(os.sep)}]+)"
-            )
+            
+            # Count occurrences of this variable in the pattern
+            count = regex_pattern.count(escaped_placeholder)
+            
+            if count == 0:
+                continue
+            
+            if var_name not in var_group_map:
+                # First occurrence: use named group
+                regex_pattern = regex_pattern.replace(
+                    escaped_placeholder,
+                    f"(?P<{var_name}>[^{re.escape(os.sep)}]+)",
+                    1  # Replace only first occurrence
+                )
+                var_group_map[var_name] = [group_counter]
+                group_counter += 1
+                
+                # Replace remaining occurrences with backreferences
+                for i in range(count - 1):
+                    regex_pattern = regex_pattern.replace(
+                        escaped_placeholder,
+                        f"(?P={var_name})",  # Backreference to first occurrence
+                        1
+                    )
         
         # Try to match the path
         regex_pattern = f"^{regex_pattern}$"
