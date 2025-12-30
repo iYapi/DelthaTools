@@ -13,6 +13,7 @@ class Toolbox(bpy.types.PropertyGroup):
             ('LIGHTING_PROPERTIES', "LightingProperties", "Lighting override controls"),
             ('LIGHTING_SETUP', "LightingSetup", "Lighting setup tools"),
             ('ANIM_PLAYBLAST', "AnimPlayblast", "Animation playblast tools"),
+            ('IMG_WIN_PATH', "ImgWinPath", "Image path management tools"),
         ],
         default='INFO',
     )
@@ -23,7 +24,7 @@ class Toolbox(bpy.types.PropertyGroup):
     )
     version: bpy.props.StringProperty(
         name="Version",
-        default="0.1.17",
+        default="0.1.19",
         options={'HIDDEN'}
     )
 
