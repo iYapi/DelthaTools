@@ -36,7 +36,9 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
             'NONE': 'None',
             'ANIM': 'Animation',
             'COMP': 'Compositing',
-            'PLAYBLAST': 'Playblast'
+            'PLAYBLAST': 'Playblast',
+            'LIGHTING': 'Lighting',
+            'RENDER': 'Render',
         }
         pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
         

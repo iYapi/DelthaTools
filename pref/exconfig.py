@@ -137,7 +137,9 @@ def on_pattern_division_update(self, context):
         'NONE': 'None',
         'ANIM': 'Animation',
         'COMP': 'Compositing',
-        'PLAYBLAST': 'Playblast'
+        'PLAYBLAST': 'Playblast',
+        'LIGHTING': 'Lighting',
+        'RENDER': 'Render',
     }
     pattern_name = division_map.get(self.project_pattern_division)
     
@@ -240,6 +242,8 @@ class ExConfigProperties(bpy.types.PropertyGroup):
             ('ANIM', "Animation", "Settings Animation"),
             ('COMP', "Compositing", "Settings Compositing"),
             ('PLAYBLAST', "Playblast", "Settings Playblast"),
+            ('LIGHTING', "Lighting", "Settings Lighting"),
+            ('RENDER', "Render", "Settings Render"),
         ],
         default='NONE',
         update=on_pattern_division_update,
