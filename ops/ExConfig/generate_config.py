@@ -31,16 +31,13 @@ class EXCONFIG_OT_GenerateConfig(bpy.types.Operator):
             self.report({'ERROR'}, "Example path is required")
             return {'CANCELLED'}
 
-        # Use division enum to determine pattern name
-        division_map = {
-            'NONE': 'None',
-            'ANIM': 'Animation',
-            'COMP': 'Compositing',
-            'PLAYBLAST': 'Playblast',
-            'LIGHTING': 'Lighting',
-            'RENDER': 'Render',
-        }
-        pattern_name = division_map.get(exconfig.project_pattern_division, exconfig.project_pattern_division)
+        # Get pattern name from the enum's display text
+        # This retrieves the second element (display name) from the enum items
+        pattern_name = None
+        for item in exconfig.bl_rna.properties['project_pattern_division'].enum_items:
+            if item.identifier == exconfig.project_pattern_division:
+                pattern_name = item.name
+                break
         
         if not pattern_name or pattern_name == 'None':
             self.report({'ERROR'}, "Please select a pattern type (Animation, Compositing, or Playblast)")

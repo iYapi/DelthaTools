@@ -132,16 +132,13 @@ def on_pattern_division_update(self, context):
         self.project_pattern_data = "{}"
         return
     
-    # Map division enum to pattern name
-    division_map = {
-        'NONE': 'None',
-        'ANIM': 'Animation',
-        'COMP': 'Compositing',
-        'PLAYBLAST': 'Playblast',
-        'LIGHTING': 'Lighting',
-        'RENDER': 'Render',
-    }
-    pattern_name = division_map.get(self.project_pattern_division)
+    # Get pattern name from the enum's display text
+    # This retrieves the second element (display name) from the enum items
+    pattern_name = None
+    for item in self.bl_rna.properties['project_pattern_division'].enum_items:
+        if item.identifier == self.project_pattern_division:
+            pattern_name = item.name
+            break
     
     if not pattern_name or pattern_name == 'None':
         self.project_pattern_base = ""
