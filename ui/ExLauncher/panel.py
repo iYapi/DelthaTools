@@ -19,13 +19,15 @@ class EXLAUNCHER_PT_Panel(bpy.types.Panel):
 
         box = layout.box()
         col = box.column(align=True)
-        col.label(text="ExLauncher Settings", icon='ROCKET')
+        col.label(text="ExLauncher Settings", icon='MEMORY')
 
         col.prop(exlauncher, "version_type", text="Version Type")
 
         col.separator()
-        col.operator("exlauncher.save_progress", text="Save Progress", icon='FILE_TICK')
-        col.operator("exlauncher.save_master", text="Save Master", icon='SAVE_AS')
+
+        row = col.row(align=True)
+        row.operator("exlauncher.save_progress", text="Save Progress", icon='FILE_BACKUP')
+        row.operator("exlauncher.save_master", text="Save Master", icon='FILE_BLEND')
 
 
 def register():
