@@ -45,7 +45,9 @@ def load_project_data(exconfig, project_data, pattern_name=None):
                 'None': 'NONE',
                 'Animation': 'ANIM',
                 'Compositing': 'COMP',
-                'Playblast': 'PLAYBLAST'
+                'Playblast': 'PLAYBLAST',
+                'Lighting': 'LIGHTING',
+                'Render': 'RENDER',
             }
             exconfig.project_pattern_division = pattern_map.get(selected_pattern_name, 'NONE')
             

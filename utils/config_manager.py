@@ -102,14 +102,12 @@ class ConfigManager:
             
             # Determine pattern name
             if pattern_name is None:
-                # Map division enum to pattern name
-                division_map = {
-                    'NONE': None,
-                    'ANIM': 'Animation',
-                    'COMP': 'Compositing',
-                    'PLAYBLAST': 'Playblast'
-                }
-                pattern_name = division_map.get(exconfig.project_pattern_division)
+                # Get pattern name from the enum's display text
+                # This retrieves the second element (display name) from the enum items
+                for item in exconfig.bl_rna.properties['project_pattern_division'].enum_items:
+                    if item.identifier == exconfig.project_pattern_division:
+                        pattern_name = item.name
+                        break
                 if not pattern_name:
                     print("No pattern selected in ExConfig")
                     return None
