@@ -241,6 +241,7 @@ class ExConfigProperties(bpy.types.PropertyGroup):
             ('PLAYBLAST', "Playblast", "Settings Playblast"),
             ('LIGHTING', "Lighting", "Settings Lighting"),
             ('RENDER', "Render", "Settings Render"),
+            ('COMP_OUTPUT', "CompOutput", "Settings Comp-Output"),
         ],
         default='NONE',
         update=on_pattern_division_update,
