@@ -14,6 +14,7 @@ class Toolbox(bpy.types.PropertyGroup):
             ('LIGHTING_SETUP', "LightingSetup", "Lighting setup tools"),
             ('ANIM_PLAYBLAST', "AnimPlayblast", "Animation playblast tools"),
             ('IMG_WIN_PATH', "ImgWinPath", "Image path management tools"),
+            ('ASSET_COL_RENAME', "AssetColRename", "Asset collection rename tools"),
         ],
         default='INFO',
     )

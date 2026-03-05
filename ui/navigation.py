@@ -5,6 +5,7 @@ from .LightingSetup import LightingSetupUI
 from .EyeGlowCompositing import EyeGlowCompositingUI
 from .AnimPlayblast import AnimPlayblastUI
 from .ImgWinPath import ImgWinPathUI
+from .AssetColRename import AssetColRenameUI
 
 
 # ------------------------------------------------------------------------
@@ -42,6 +43,8 @@ class NAV_PT_Panel(bpy.types.Panel):
             AnimPlayblastUI(self.layout, context).draw()
         elif s.toolbox.ui_mode == 'IMG_WIN_PATH':
             ImgWinPathUI(self.layout, context).draw()
+        elif s.toolbox.ui_mode == 'ASSET_COL_RENAME':
+            AssetColRenameUI(self.layout, context).draw()
 
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
