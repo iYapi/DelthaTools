@@ -22,6 +22,8 @@ class ACR_OT_RenameReplaceAsset(bpy.types.Operator):
         visited_objs = set()
         
         def process_col(col):
+            if col.name.endswith("grp_rig"):
+                return
             prefix = f"{filename}_{col.name}"
             for obj in col.objects:
                 if obj.type != 'ARMATURE' and obj not in visited_objs:
