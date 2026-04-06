@@ -55,7 +55,7 @@ Marker `EX_START` dan `EX_END` akan muncul di timeline.
 
 Klik tombol **"Add Safe Area"** untuk menampilkan overlay safe area di camera. Ini berguna untuk mengecek batas aman frame sebelum render.
 
-![Tambah Safe Area ke camera](../images/anim-playblast-step-03.jpeg)
+![Tambah Safe Area ke camera](../images/photo_6240286533189570266_w.jpg)
 
 ---
 
@@ -71,15 +71,13 @@ Tool akan secara otomatis:
 5. Membersihkan render marker setelah selesai
 6. Mengembalikan viewport ke mode normal
 
-![Klik Render Playblast](../images/anim-playblast-step-04.jpeg)
+![Klik Render Playblast](../images/photo_6240286533189570268_m.jpg)
 
 ---
 
 ### Langkah 5 — Verifikasi Output
 
 Setelah render selesai, cek folder output yang dikonfigurasi di ExConfig. File video playblast sudah tersimpan di path yang ditentukan.
-
-![Hasil output playblast](../images/anim-playblast-step-05.jpeg)
 
 ---
 
