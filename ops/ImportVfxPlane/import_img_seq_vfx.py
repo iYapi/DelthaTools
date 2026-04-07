@@ -1,5 +1,13 @@
 import bpy
 import os
+import re
+
+def get_sequence_offset(file_stem: str) -> int:
+    match = re.search(r'(\d+)$', file_stem)
+    if match:
+        frame_number = int(match.group(1))
+        return max(0, frame_number - 1)
+    return 0
 
 
 class OT_ImportImageSequence(bpy.types.Operator):
@@ -38,7 +46,7 @@ class OT_ImportImageSequence(bpy.types.Operator):
 
         start_frame = context.scene.frame_current
 
-        offset = 0
+        offset = get_sequence_offset(file_stem)
 
         plane_name = file_stem
 
