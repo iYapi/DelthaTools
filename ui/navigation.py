@@ -6,6 +6,7 @@ from .EyeGlowCompositing import EyeGlowCompositingUI
 from .AnimPlayblast import AnimPlayblastUI
 from .ImgWinPath import ImgWinPathUI
 from .AssetColRename import AssetColRenameUI
+from .ImportVfxPlane import ImportVfxPlaneUI
 
 
 # ------------------------------------------------------------------------
@@ -45,7 +46,8 @@ class NAV_PT_Panel(bpy.types.Panel):
             ImgWinPathUI(self.layout, context).draw()
         elif s.toolbox.ui_mode == 'ASSET_COL_RENAME':
             AssetColRenameUI(self.layout, context).draw()
-
+        elif s.toolbox.ui_mode == 'IMPORT_VFX_PLANE':
+            ImportVfxPlaneUI(self.layout, context).draw()
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
     bl_label = "ExToolbox"
