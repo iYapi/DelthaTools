@@ -73,7 +73,6 @@ class OT_ImportMovieTexture(bpy.types.Operator):
         bsdf = nodes.new("ShaderNodeBsdfPrincipled")
         bsdf.location = (100, 300)
         links.new(tex_image.outputs["Color"], bsdf.inputs["Base Color"])
-        links.new(tex_image.outputs["Alpha"], bsdf.inputs["Alpha"])
 
         output = nodes.new("ShaderNodeOutputMaterial")
         output.location = (400, 300)
