@@ -7,6 +7,7 @@ from .AnimPlayblast import AnimPlayblastUI
 from .ImgWinPath import ImgWinPathUI
 from .AssetColRename import AssetColRenameUI
 from .ImportVfxPlane import ImportVfxPlaneUI
+from .Proxyfy import ProxyfyUI
 
 
 # ------------------------------------------------------------------------
@@ -48,6 +49,9 @@ class NAV_PT_Panel(bpy.types.Panel):
             AssetColRenameUI(self.layout, context).draw()
         elif s.toolbox.ui_mode == 'IMPORT_VFX_PLANE':
             ImportVfxPlaneUI(self.layout, context).draw()
+        elif s.toolbox.ui_mode == 'PROXYFY':
+            ProxyfyUI(self.layout, context).draw()
+
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
     bl_label = "ExToolbox"

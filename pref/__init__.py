@@ -1,4 +1,4 @@
-from . import master, exconfig, lighting_properties, lighting_setup, exlauncher
+from . import master, exconfig, lighting_properties, lighting_setup, exlauncher, proxyfy
 
 modules = [
     master,
@@ -6,6 +6,7 @@ modules = [
     exlauncher,
     lighting_properties,
     lighting_setup,
+    proxyfy,
 ]
 
 

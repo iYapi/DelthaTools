@@ -16,6 +16,7 @@ class Toolbox(bpy.types.PropertyGroup):
             ('IMG_WIN_PATH', "ImgWinPath", "Image path management tools"),
             ('ASSET_COL_RENAME', "AssetColRename", "Asset collection rename tools"),
             ('IMPORT_VFX_PLANE', "ImportVfxPlane", "Import movie or image sequence as plane with correct settings"),
+            ('PROXYFY', "Proxyfy", "I don't know")
         ],
         default='INFO',
     )
