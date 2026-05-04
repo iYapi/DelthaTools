@@ -14,11 +14,11 @@ from .Proxyfy import ProxyfyUI
 # Navigation Panel Properties
 # ------------------------------------------------------------------------
 class NAV_PT_Panel(bpy.types.Panel):
-    bl_label = "ExToolbox"
+    bl_label = "DelthλTools"
     bl_idname = "EXTOOLBOX_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'ExToolbox'
+    bl_category = 'DelthλTools'
     bl_description = "Navigation panel for MasterX Tools"
 
     def draw(self, context):
@@ -35,8 +35,8 @@ class NAV_PT_Panel(bpy.types.Panel):
             # Header: version + quick info
             box = layout.box()
             col = box.column(align=True)
-            col.label(text=f"ExToolbox v{s.toolbox.version}", icon='INFO')
-            col.label(text="Maintainer: MrYapikZ")
+            col.label(text=f"DelthλTools v{s.toolbox.version}", icon='INFO')
+            col.label(text="Maintainer: Yapi")
         elif s.toolbox.ui_mode == 'LIGHTING_PROPERTIES':
             LightingPropertiesUI(self.layout, context).draw()
         elif s.toolbox.ui_mode == 'LIGHTING_SETUP':
@@ -54,11 +54,11 @@ class NAV_PT_Panel(bpy.types.Panel):
 
 
 class NAV_PT_PanelCompositing(bpy.types.Panel):
-    bl_label = "ExToolbox"
+    bl_label = "DelthλTools"
     bl_idname = "EXTOOLBOX_PT_panel_compositing"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = 'ExToolbox'
+    bl_category = 'DelthλTools'
     bl_description = "Compositing panel for MasterX Tools"
 
     def draw(self, context):
@@ -75,8 +75,8 @@ class NAV_PT_PanelCompositing(bpy.types.Panel):
             # Header: version + quick info
             box = layout.box()
             col = box.column(align=True)
-            col.label(text=f"ExToolbox v{s.toolbox.version}", icon='INFO')
-            col.label(text="Maintainer: MrYapikZ")
+            col.label(text=f"DelthλTools v{s.toolbox.version}", icon='INFO')
+            col.label(text="Maintainer: Yapi")
         elif s.toolbox_compositing.ui_mode == 'EYE_GLOW_COMPOSITING':
             EyeGlowCompositingUI(self.layout, context).draw()
 

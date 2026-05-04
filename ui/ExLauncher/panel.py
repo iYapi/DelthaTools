@@ -5,11 +5,11 @@ import bpy
 # ExLauncher UI
 # ------------------------------------------------------------------------
 class EXLAUNCHER_PT_Panel(bpy.types.Panel):
-    bl_label = "ExLauncher"
+    bl_label = "DelthλLauncher"
     bl_idname = "EXLAUNCHER_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'ExToolbox'
+    bl_category = 'DelthλTools'
     bl_description = "ExLauncher panel for MasterX Tools"
 
     def draw(self, context):
@@ -19,7 +19,7 @@ class EXLAUNCHER_PT_Panel(bpy.types.Panel):
 
         box = layout.box()
         col = box.column(align=True)
-        col.label(text="ExLauncher Settings", icon='MEMORY')
+        col.label(text="DelthλLauncher Settings", icon='MEMORY')
 
         col.prop(exlauncher, "version_type", text="Version Type")
 

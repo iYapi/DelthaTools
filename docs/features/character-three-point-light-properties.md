@@ -1,7 +1,7 @@
 # Character Three Point Light Properties
 
 **Kategori:** Lighting, Compositing & Render Tool
-**Tool:** ExToolbox → LightingProperties
+**Tool:** DelthλTools → LightingProperties
 
 ---
 
@@ -22,7 +22,7 @@ Sebelum menggunakan tool ini, pastikan:
 
 - Lighting setup sudah ter-append di scene (lihat [Character Three Point Light Setup](./character-three-point-light-setup.md))
 - Light objects sudah memiliki custom property key yang sesuai (dikonfigurasi di panel LightingProperties)
-- ExToolbox sudah terpasang dan aktif
+- DelthλTools sudah terpasang dan aktif
 
 ---
 
@@ -30,11 +30,11 @@ Sebelum menggunakan tool ini, pastikan:
 
 ### Export Lighting Preset
 
-#### Langkah 1 — Buka ExToolbox & Pilih Mode
+#### Langkah 1 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `LightingProperties`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `LightingProperties`.
 
-![Pilih mode LightingProperties di ExToolbox](../images/light-props-step-01.jpeg)
+![Pilih mode LightingProperties di DelthλTools](../images/light-props-step-01.jpeg)
 
 ---
 
@@ -112,7 +112,7 @@ Klik tombol **"Override Fog Materials"** untuk membuat override pada hierarchy c
 Pastikan nama collection dan nama light di file JSON cocok dengan yang ada di scene. Nama bersifat case-sensitive.
 
 **Tombol Export/Import tidak muncul?**
-Pastikan mode yang dipilih di ExToolbox adalah `LightingProperties`.
+Pastikan mode yang dipilih di DelthλTools adalah `LightingProperties`.
 
 **Make Override Lights Local tidak memproses light?**
 Pastikan light objects adalah library override (bukan local murni). Jika tidak ada override light, tool tidak akan mengubah apa pun.

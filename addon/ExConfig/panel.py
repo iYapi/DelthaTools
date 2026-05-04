@@ -10,7 +10,7 @@ class ExConfigPanelUI:
         s = self.context.scene
 
         box = layout.box()
-        box.label(text="ExToolbox Configuration", icon="PREFERENCES")
+        box.label(text="DelthλTools Configuration", icon="PREFERENCES")
 
         row = box.row(align=True)
         row.prop(s.toolbox, "show_exconfig", text="Show Config")

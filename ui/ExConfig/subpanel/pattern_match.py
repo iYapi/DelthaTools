@@ -5,7 +5,7 @@ import bpy
 # ExConfig Pattern Match Subpanel
 # ------------------------------------------------------------------------
 class EXCONFIG_PT_PatternMatch(bpy.types.Panel):
-    bl_label = "ExConfig Pattern Match"
+    bl_label = "DelthλConfig Pattern Match"
     bl_idname = "EXCONFIG_PT_pattern_match"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

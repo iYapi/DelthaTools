@@ -1,7 +1,7 @@
 bl_info = {
-    "name": "ExToolbox",
+    "name": "DelthλTools",
     "description": "Tools for Blender",
-    "author": "MrYapikZ",
+    "author": "Yapi",
     "version": (0, 2, 5),
     "blender": (4, 5, 0),
 }
