@@ -6,13 +6,10 @@ from .set_child_of_bone_popup import CUSTOM_BONE_NAME
 # ------------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------------
-# Collections can have multiple parents in Blender; this just ensures child_coll is linked under parent_coll.
 def ensure_root_child(parent_coll: bpy.types.Collection, child_coll: bpy.types.Collection):
-    """Link child_coll under parent_coll if not already linked anywhere; if already has a parent, don't duplicate."""
-    # If it already lives under parent_coll, do nothing
+    """Link child_coll under parent_coll if not already linked there."""
     if child_coll.name in parent_coll.children.keys():
         return
-    # Collections can have multiple parents in Blender; safe to link.
     parent_coll.children.link(child_coll)
 
 
@@ -23,14 +20,11 @@ def unique_collection_name(base: str, reporter=None) -> str | None:
     """
     if bpy.data.collections.get(base) is None:
         return base
-
-    # base name already taken → stop and warn
     if reporter:
         reporter({'WARNING'}, f"Collection '{base}' already exists. Aborting to avoid conflict.")
     return None
 
 
-# Insert _<suffix> before any numeric .### tail.
 def object_name_with_suffix(name: str, suffix: str) -> str:
     """
     Insert _<suffix> before any numeric .### tail.
@@ -38,8 +32,7 @@ def object_name_with_suffix(name: str, suffix: str) -> str:
     """
     wanted_tail = f"_{suffix}"
     if name.endswith(wanted_tail) or re.search(rf"_{re.escape(suffix)}\.\d{{3}}$", name):
-        return name  # already has suffix (with or without numeric tail)
-
+        return name
     m = re.match(r"^(.*?)(\.\d{3})$", name)
     if m:
         core, num = m.groups()
@@ -54,8 +47,6 @@ def unique_object_name(desired: str, reporter=None) -> str:
     """
     if bpy.data.objects.get(desired) is None:
         return desired
-
-    # desired name already taken → stop and warn
     if reporter:
         reporter({'WARNING'}, f"Object '{desired}' already exists. Aborting to avoid conflict.")
     return None
@@ -67,7 +58,6 @@ def add_suffix_to_objects_in_collection(coll: bpy.types.Collection, suffix: str,
     Returns the count of objects renamed.
     """
     renamed = 0
-    # coll.all_objects includes objects from nested child collections
     objs = getattr(coll, "all_objects", coll.objects)
     for obj in objs:
         old = obj.name
@@ -79,32 +69,23 @@ def add_suffix_to_objects_in_collection(coll: bpy.types.Collection, suffix: str,
                 obj[key] = obj.name
                 renamed += 1
             except Exception:
-                # Silently skip if renaming is blocked by some operator context
                 pass
     return renamed
 
 
-# Detect rig in collection
 def _all_objects_in_collection(coll: bpy.types.Collection):
     """Return all objects in `coll`, including from nested child collections."""
     return getattr(coll, "all_objects", coll.objects)
 
 
 def _score_rig_candidate(obj: bpy.types.Object) -> int:
-    """
-    Rank likely rigs:
-      +2 if name contains 'rig'
-      +1 if it has pose bones (i.e. at least one bone)
-      +1 if it has any custom properties (often true for rig controllers)
-    Higher is better.
-    """
     score = 0
     name_l = obj.name.lower()
     if "rig" in name_l or name_l.startswith("rg") or name_l.endswith("_rig"):
         score += 2
     if obj.type == 'ARMATURE' and obj.data and len(getattr(obj.data, "bones", [])) > 0:
         score += 1
-    if len(obj.keys()) > 0:  # custom props on object
+    if len(obj.keys()) > 0:
         score += 1
     return score
 
@@ -120,12 +101,10 @@ def pick_preferred_rig(rigs: list[bpy.types.Object]) -> bpy.types.Object | None:
         return None
     if len(rigs) == 1:
         return rigs[0]
-    # Multiple rigs → score them and pick the highest
     scored = sorted(rigs, key=_score_rig_candidate, reverse=True)
     return scored[0]
 
 
-# Add constraints to lights to track character rig
 def all_objects_in_collection(coll: bpy.types.Collection):
     return getattr(coll, "all_objects", coll.objects)
 
@@ -143,8 +122,6 @@ def find_light_root_candidate(coll: bpy.types.Collection, suffix: str):
     obj = find_object_in_collection(coll, exact)
     if obj:
         return obj
-
-    # fallback: unique startswith('light_root')
     cands = [o for o in all_objects_in_collection(coll) if o.name.lower().startswith("light_root")]
     if len(cands) == 1:
         return cands[0]
@@ -153,14 +130,14 @@ def find_light_root_candidate(coll: bpy.types.Collection, suffix: str):
 
 def ensure_child_of_to_c_traj(root_obj: bpy.types.Object, rig: bpy.types.Object, is_napo: bool = False, reporter=None) -> bool:
     """
-    Adds Child Of to root_obj targeting rig's 'c_traj' bone and clear inverse to keep current world transform.
+    Adds Child Of to root_obj targeting rig's 'c_traj' bone and clears inverse to keep current world transform.
     Returns True on success.
     """
     if rig is None or rig.type != 'ARMATURE':
-        if reporter: reporter({'WARNING'}, "No valid rig (Armature) to constrain to.")
+        if reporter:
+            reporter({'WARNING'}, "No valid rig (Armature) to constrain to.")
         return False
 
-    # Find the bone to target: prefer 'c_traj', fallback to 'body'
     pb = None
     if rig.pose:
         if not is_napo:
@@ -182,7 +159,6 @@ def ensure_child_of_to_c_traj(root_obj: bpy.types.Object, rig: bpy.types.Object,
                 reporter({'WARNING'}, "Rig has neither 'c_traj' nor 'body' pose bone.")
             return False
 
-    # Reuse existing matching constraint if any
     con = None
     for c in root_obj.constraints:
         if c.type == 'CHILD_OF' and c.target == rig and c.subtarget == pb.name:
@@ -193,10 +169,7 @@ def ensure_child_of_to_c_traj(root_obj: bpy.types.Object, rig: bpy.types.Object,
         con.target = rig
         con.subtarget = pb.name
 
-    # Try to clear inverse that preserves current world matrix
     con.inverse_matrix = mathutils.Matrix.Identity(4)
-
-    # Enable all influence channels
     con.influence = 1.0
     con.use_location_x = con.use_location_y = con.use_location_z = True
     con.use_rotation_x = con.use_rotation_y = con.use_rotation_z = True
@@ -209,27 +182,17 @@ def find_named_light(coll: bpy.types.Collection, base: str, suffix: str):
     for o in all_objects_in_collection(coll):
         if o.type == 'LIGHT' and o.name == exact:
             return o
-    # fallback: unique prefix match
     cands = [o for o in all_objects_in_collection(coll)
              if o.type == 'LIGHT' and o.name.lower().startswith(base.lower())]
     return cands[0] if len(cands) == 1 else None
 
 
 def ensure_shared_receiver_collection(rcv_name: str) -> bpy.types.Collection:
-    """
-    Create or reuse a single receiver collection for light linking.
-    It will be assigned to lights, but unlinked from all scene parents after setup.
-    Returns the collection.
-    """
-    # Create or reuse receiver
-    rcv = bpy.data.collections.get(rcv_name) or bpy.data.collections.new(rcv_name)
-    return rcv
+    """Create or reuse a single receiver collection for light linking."""
+    return bpy.data.collections.get(rcv_name) or bpy.data.collections.new(rcv_name)
 
 
 def assign_receiver_collection_to_light(light: bpy.types.Object, rcv: bpy.types.Collection) -> bool:
-    """
-    Assign the given receiver collection to the light (UI: Object Properties > Shading > Light Linking).
-    """
     if not hasattr(light, "light_linking"):
         return False
     try:
@@ -241,9 +204,6 @@ def assign_receiver_collection_to_light(light: bpy.types.Object, rcv: bpy.types.
 
 
 def add_active_collection_to_receiver(rcv: bpy.types.Collection, active_coll: bpy.types.Collection) -> bool:
-    """
-    Add the active collection as a child of the shared receiver collection (no flags, just like the UI).
-    """
     if active_coll.name not in rcv.children.keys():
         rcv.children.link(active_coll)
         return True
@@ -252,10 +212,7 @@ def add_active_collection_to_receiver(rcv: bpy.types.Collection, active_coll: bp
 
 def delete_collection(coll: bpy.types.Collection):
     """Unlink and delete the given collection."""
-    # Unlink from all parents
-
     if coll:
-        # First unlink it from all scenes and parent collections
         for scene in bpy.data.scenes:
             if coll.name in scene.collection.children:
                 scene.collection.children.unlink(coll)
@@ -264,12 +221,10 @@ def delete_collection(coll: bpy.types.Collection):
                 parent.children.unlink(coll)
         for obj in list(coll.objects):
             bpy.data.objects.remove(obj, do_unlink=True)
-
-        # Finally, remove it from bpy.data entirely
         bpy.data.collections.remove(coll)
         print(f"Deleted collection: {coll.name}")
     else:
-        print(f"Collection '{coll.name}' not found.")
+        print(f"Collection not found.")
 
 
 # ------------------------------------------------------------------------
@@ -291,140 +246,249 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
             self.report({'ERROR'}, "No presets file path specified")
             return {'CANCELLED'}
 
-        ## Detect selected collection
-        layer_coll = getattr(context.view_layer, "active_layer_collection", None)
-        if not layer_coll:
-            self.report({'ERROR'}, "No active collection. Click a collection in the Outliner first.")
-            return {'CANCELLED'}
+        # ----------------------------------------------------------------
+        # SPLITKEY
+        # ----------------------------------------------------------------
+        if props.lighting_type == "SPLITKEY":
+            target_scene_name = "SplitKey"
+            collection_to_append = None
 
-        active_coll = layer_coll.collection
-        sel_name = active_coll.name
-
-        ## Detect rig in selected collection
-        rigs = find_rigs_in_collection(active_coll)
-        rig = pick_preferred_rig(rigs)
-
-        if rig is None:
-            self.report({'WARNING'}, f"No rig (Armature) found under collection '{sel_name}'.")
-            return {'CANCELLED'}  # uncomment to enforce presence
-        else:
-            # Optional: make it active/selected for convenience
+            # 1. Peek into the file — temporarily load the scene to find
+            #    the LightingSetup collection name inside it.
             try:
-                bpy.ops.object.select_all(action='DESELECT')
-            except Exception:
-                pass
-            rig.select_set(True)
-            context.view_layer.objects.active = rig
-            self.report({'INFO'}, f"Detected rig: {rig.name} in collection '{sel_name}'.")
-        rig.data.pose_position = 'REST'
-
-        ## Check if collection name starts with 'c-'
-        if sel_name.lower().startswith("c-"):
-            suffix = sel_name[2:] or sel_name  # handle 'c-' edge-case
-        else:
-            self.report({'WARNING'},
-                        f"Active collection '{sel_name}' doesn't start with 'c-'. Continuing and keeping name.")
-            return {'CANCELLED'}
-
-        ## Ensure 'RIMFILL' collection exists
-        rimfill = bpy.data.collections.get("RIMFILL")
-        if rimfill is None:
-            rimfill = bpy.data.collections.new("RIMFILL")
-            context.scene.collection.children.link(rimfill)
-
-        ## Append 'LightingSetup' collection from blend file
-        try:
-            with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
-                if 'LightingSetup' in data_from.collections:
-                    data_to.collections = ['LightingSetup']
-                else:
-                    self.report({'ERROR'}, "No 'LightingSetup' collection found in the blend file.")
-                    return {'CANCELLED'}
-        except Exception as e:
-            self.report({'ERROR'}, f"Failed to load library: {e}")
-            return {'CANCELLED'}
-
-        ## Rename appended collections to 'rf-' and link under RIMFILL
-        renamed_any = False
-        for coll in getattr(data_to, "collections", []):
-            if coll is None:
-                continue
-            # Link under RIMFILL (not the scene root)
-            ensure_root_child(rimfill, coll)
-
-            # Rename collection to 'rf-<suffix>'
-            target_name = unique_collection_name(f"rf-{suffix}")
-            try:
-                coll.name = target_name
-                renamed_any = True
+                with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                    if target_scene_name not in data_from.scenes:
+                        self.report({'ERROR'}, f"Scene '{target_scene_name}' not found in blend file.")
+                        return {'CANCELLED'}
+                    data_to.scenes = [target_scene_name]
             except Exception as e:
-                self.report({'WARNING'}, f"Could not rename appended collection: {e}")
+                self.report({'ERROR'}, f"Failed to load library for scene peek: {e}")
+                return {'CANCELLED'}
 
-            # Rename all objects inside the collection to include _<suffix>
+            # 2. Identify the LightingSetup collection from the temp scene
+            temp_scene = bpy.data.scenes.get(target_scene_name)
+            if temp_scene is None:
+                self.report({'ERROR'}, f"Temp scene '{target_scene_name}' not available after load.")
+                return {'CANCELLED'}
+
+            for col in temp_scene.collection.children:
+                if "SplitKey" in col.name:
+                    collection_to_append = col.name
+                    break
+
+            # Remove the temporary scene now that we have the name
+            bpy.data.scenes.remove(temp_scene)
+
+            if not collection_to_append:
+                self.report({'ERROR'}, "No LightingSetup collection found in that scene.")
+                return {'CANCELLED'}
+
+            # 3. Append ONLY the collection
+            try:
+                with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                    if collection_to_append not in data_from.collections:
+                        self.report({'ERROR'}, f"Collection '{collection_to_append}' not found in blend file.")
+                        return {'CANCELLED'}
+                    data_to.collections = [collection_to_append]
+            except Exception as e:
+                self.report({'ERROR'}, f"Failed to append collection: {e}")
+                return {'CANCELLED'}
+
+            # 4. Handle the newly appended collection
+            new_col = bpy.data.collections.get(collection_to_append)
+            if new_col is None:
+                self.report({'ERROR'}, f"Appended collection '{collection_to_append}' not found in scene data.")
+                return {'CANCELLED'}
+
+            # Ensure local 'LightingSetup' exists
+            LightingSetup = bpy.data.collections.get("LightingSetup")
+            if not LightingSetup:
+                LightingSetup = bpy.data.collections.new("LightingSetup")
+                context.scene.collection.children.link(LightingSetup)
+
+            # 5. Rename and link under LightingSetup
+            new_col.name = f"global-{new_col.name}"
+            ensure_root_child(LightingSetup, new_col)
+
+            renamed_count = add_suffix_to_objects_in_collection(new_col, 'global', properties_props.key)
+            if renamed_count:
+                self.report({'INFO'}, f"Renamed {renamed_count} object(s) to include _{'global'}.")
+            else:
+                self.report({'INFO'}, f"No object names needed _{'global'} (already suffixed or none found).")
+
+            self.report({'INFO'}, f"Appended {new_col.name} from {target_scene_name}")
+            return {'FINISHED'}
+
+        # ----------------------------------------------------------------
+        # LIGHTCHAR
+        # ----------------------------------------------------------------
+        elif props.lighting_type == "LIGHTCHAR":
+            target_scene_name = "LightChar"
+
+            ## Detect selected collection
+            layer_coll = getattr(context.view_layer, "active_layer_collection", None)
+            if not layer_coll:
+                self.report({'ERROR'}, "No active collection. Click a collection in the Outliner first.")
+                return {'CANCELLED'}
+
+            active_coll = layer_coll.collection
+            sel_name = active_coll.name
+
+            ## Detect rig in selected collection
+            rigs = find_rigs_in_collection(active_coll)
+            rig = pick_preferred_rig(rigs)
+
+            if rig is None:
+                self.report({'WARNING'}, f"No rig (Armature) found under collection '{sel_name}'.")
+                return {'CANCELLED'}
+            else:
+                try:
+                    bpy.ops.object.select_all(action='DESELECT')
+                except Exception:
+                    pass
+                rig.select_set(True)
+                context.view_layer.objects.active = rig
+                self.report({'INFO'}, f"Detected rig: {rig.name} in collection '{sel_name}'.")
+
+            rig.data.pose_position = 'REST'
+
+            ## Derive suffix from collection name (must start with 'c-')
+            if sel_name.lower().startswith("c-"):
+                suffix = sel_name[2:] or sel_name
+            else:
+                self.report({'WARNING'},
+                            f"Active collection '{sel_name}' doesn't start with 'c-'. Aborting.")
+                return {'CANCELLED'}
+
+            ## Ensure 'LightingSetup' collection exists
+            LightingSetup = bpy.data.collections.get("LightingSetup")
+            if LightingSetup is None:
+                LightingSetup = bpy.data.collections.new("LightingSetup")
+                context.scene.collection.children.link(LightingSetup)
+
+            ## Peek into the blend file to find 'LightChar' inside the 'LightChar' scene,
+            ## then append only that collection — mirroring the SPLITKEY approach.
+            collection_to_append = None
+            try:
+                with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                    if target_scene_name not in data_from.scenes:
+                        self.report({'ERROR'}, f"Scene '{target_scene_name}' not found in blend file.")
+                        rig.data.pose_position = 'POSE'
+                        return {'CANCELLED'}
+                    data_to.scenes = [target_scene_name]
+            except Exception as e:
+                self.report({'ERROR'}, f"Failed to load library for scene peek: {e}")
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            temp_scene = bpy.data.scenes.get(target_scene_name)
+            if temp_scene is None:
+                self.report({'ERROR'}, f"Temp scene '{target_scene_name}' not available after load.")
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            for col in temp_scene.collection.children:
+                if "LightChar" in col.name:
+                    collection_to_append = col.name
+                    break
+
+            bpy.data.scenes.remove(temp_scene)
+
+            if not collection_to_append:
+                self.report({'ERROR'}, f"No LightChar collection found in scene '{target_scene_name}'.")
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            ## Append the collection
+            try:
+                with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                    if collection_to_append not in data_from.collections:
+                        self.report({'ERROR'}, f"Collection '{collection_to_append}' not found in blend file.")
+                        rig.data.pose_position = 'POSE'
+                        return {'CANCELLED'}
+                    data_to.collections = [collection_to_append]
+            except Exception as e:
+                self.report({'ERROR'}, f"Failed to load library: {e}")
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            ## Get the appended collection
+            coll = bpy.data.collections.get(collection_to_append)
+            if coll is None:
+                self.report({'ERROR'}, f"Appended collection '{collection_to_append}' not found in scene data.")
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            ## Link under LightingSetup
+            ensure_root_child(LightingSetup, coll)
+
+            ## Rename collection to 'rf-<suffix>' — abort cleanly on name collision
+            target_name = unique_collection_name(f"rf-{suffix}", reporter=self.report)
+            if target_name is None:
+                delete_collection(coll)
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            coll.name = target_name
+
+            ## Rename all objects inside the collection to include _<suffix>
             renamed_count = add_suffix_to_objects_in_collection(coll, suffix, properties_props.key)
             if renamed_count:
                 self.report({'INFO'}, f"Renamed {renamed_count} object(s) to include _{suffix}.")
-
-                ## Set lighting to character's rig
-                rig.data.pose_position = 'REST'
-                light_root = find_light_root_candidate(coll, suffix)
-                if light_root and rig:
-                    ### SPECIAL CASE NAPO
-                    if ensure_child_of_to_c_traj(root_obj=light_root,rig=rig,is_napo=(sel_name == "c-napo"),reporter=self.report):
-                        self.report({'INFO'},
-                                    f"Added Child Of (target: {rig.name}, bone: c_traj or body) to '{light_root.name}'.")
-                    else:
-                        self.report({'WARNING'}, f"Could not complete Child Of setup for '{light_root.name}'.")
-                        delete_collection(coll)
-                else:
-                    if not light_root:
-                        self.report({'WARNING'},
-                                    f"No root light found in '{coll.name}'. Expected 'light_root_{suffix}'.")
-                    if not rig:
-                        self.report({'WARNING'}, f"No rig detected under active collection '{sel_name}'.")
-                    delete_collection(coll)
-
-
-                ## Set up light linking for fill and rim lights
-                fill_light = find_named_light(coll, "l-fill", suffix)
-                rim_light = find_named_light(coll, "l-rim", suffix)
-
-                # One shared receiver collection name, e.g. ties to the suffix or rf-collection name
-                shared_rcv = ensure_shared_receiver_collection(f"LL_{suffix}")  # or f"LL_rf-{suffix}" if you prefer
-                if not shared_rcv:
-                    self.report({'WARNING'}, "Light Linking API not available; skipped receiver collection setup.")
-                else:
-                    # Assign both lights to the SAME receiver collection
-                    if fill_light:
-                        ok_fill = assign_receiver_collection_to_light(fill_light, shared_rcv)
-                        if ok_fill:
-                            self.report({'INFO'}, f"'{fill_light.name}' uses shared receiver '{shared_rcv.name}'.")
-                        else:
-                            self.report({'WARNING'}, f"Failed to assign receiver to '{fill_light.name}'.")
-
-                    if rim_light:
-                        ok_rim = assign_receiver_collection_to_light(rim_light, shared_rcv)
-                        if ok_rim:
-                            self.report({'INFO'}, f"'{rim_light.name}' uses shared receiver '{shared_rcv.name}'.")
-                        else:
-                            self.report({'WARNING'}, f"Failed to assign receiver to '{rim_light.name}'.")
-
-                    # Add the active collection once to the shared receiver
-                    if add_active_collection_to_receiver(shared_rcv, active_coll):
-                        self.report({'INFO'}, f"Added '{sel_name}' to shared receiver '{shared_rcv.name}'.")
-                    else:
-                        self.report({'INFO'}, f"'{sel_name}' already present in shared receiver '{shared_rcv.name}'.")
-
-
             else:
                 self.report({'INFO'}, f"No object names needed _{suffix} (already suffixed or none found).")
 
-        if not renamed_any:
-            self.report({'WARNING'}, "Lighting setup appended but renaming may have failed.")
+            ## Set lighting to character's rig
+            light_root = find_light_root_candidate(coll, suffix)
+            if not light_root:
+                self.report({'WARNING'}, f"No root light found in '{coll.name}'. Expected 'light_root_{suffix}'.")
+                delete_collection(coll)
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
 
-        rig.data.pose_position = 'POSE'
-        self.report({'INFO'}, f"Lighting setup appended into 'RIMFILL' as 'rm-{suffix}'.")
-        return {'FINISHED'}
+            if not ensure_child_of_to_c_traj(
+                root_obj=light_root,
+                rig=rig,
+                is_napo=(sel_name == "c-napo"),
+                reporter=self.report
+            ):
+                self.report({'WARNING'}, f"Could not complete Child Of setup for '{light_root.name}'.")
+                delete_collection(coll)
+                rig.data.pose_position = 'POSE'
+                return {'CANCELLED'}
+
+            self.report({'INFO'}, f"Added Child Of (target: {rig.name}) to '{light_root.name}'.")
+
+            ## Set up light linking for fill and rim lights
+            fill_light = find_named_light(coll, "l-fill", suffix)
+            rim_light = find_named_light(coll, "l-rim", suffix)
+
+            shared_rcv = ensure_shared_receiver_collection(f"LL_{suffix}")
+            if not shared_rcv:
+                self.report({'WARNING'}, "Light Linking API not available; skipped receiver collection setup.")
+            else:
+                if fill_light:
+                    if assign_receiver_collection_to_light(fill_light, shared_rcv):
+                        self.report({'INFO'}, f"'{fill_light.name}' uses shared receiver '{shared_rcv.name}'.")
+                    else:
+                        self.report({'WARNING'}, f"Failed to assign receiver to '{fill_light.name}'.")
+
+                if rim_light:
+                    if assign_receiver_collection_to_light(rim_light, shared_rcv):
+                        self.report({'INFO'}, f"'{rim_light.name}' uses shared receiver '{shared_rcv.name}'.")
+                    else:
+                        self.report({'WARNING'}, f"Failed to assign receiver to '{rim_light.name}'.")
+
+                if add_active_collection_to_receiver(shared_rcv, active_coll):
+                    self.report({'INFO'}, f"Added '{sel_name}' to shared receiver '{shared_rcv.name}'.")
+                else:
+                    self.report({'INFO'}, f"'{sel_name}' already present in shared receiver '{shared_rcv.name}'.")
+
+            rig.data.pose_position = 'POSE'
+            self.report({'INFO'}, f"Lighting setup appended into 'LightingSetup' as 'rf-{suffix}'.")
+            return {'FINISHED'}
+
+        return {'CANCELLED'}
 
 
 def register():

@@ -210,6 +210,10 @@ class LightingPropertiesUI:
                             row.prop(o.data, "exposure", text="Exposure")
                         if hasattr(o.data, "shadow_jitter_overblur"):
                             row.prop(o.data, "shadow_jitter_overblur", text="Shadow Jitter")
+                        
+                        # If light is a "SUN"
+                        if o.data.type == 'SUN':
+                            row.prop(o.data, "angle", text="Angle")
 
                     elif o.type == 'EMPTY':
                         # Aim/root helpers live here
