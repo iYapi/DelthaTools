@@ -1,7 +1,7 @@
 # Character Three Point Light Setup
 
 **Kategori:** Lighting, Compositing & Render Tool
-**Tool:** ExToolbox → LightingSetup
+**Tool:** DelthλTools → LightingSetup
 
 ---
 
@@ -28,8 +28,8 @@ Sebelum menggunakan tool ini, pastikan:
 - Project sudah dibuka di Blender
 - Collection karakter sudah tersedia dan namanya **diawali dengan `c-`**
 - Collection karakter memiliki **rig (Armature)** di dalamnya
-- File preset blend (lighting setup) sudah dikonfigurasi di panel ExToolbox
-- ExToolbox sudah terpasang dan aktif di 3D Viewport
+- File preset blend (lighting setup) sudah dikonfigurasi di panel DelthλTools
+- DelthλTools sudah terpasang dan aktif di 3D Viewport
 
 ---
 
@@ -45,11 +45,11 @@ Collection harus diawali dengan prefix `c-`, contoh: `c-hero`.
 
 ---
 
-### Langkah 2 — Buka ExToolbox & Pilih Mode
+### Langkah 2 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `LightingSetup`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `LightingSetup`.
 
-![Pilih mode LightingSetup di ExToolbox](../images/light-setup-step-02.jpeg)
+![Pilih mode LightingSetup di DelthλTools](../images/light-setup-step-02.jpeg)
 
 ---
 

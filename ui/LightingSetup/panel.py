@@ -10,6 +10,7 @@ class LightingSetupUI:
         s = self.context.scene
         props = s.lighting_setup
 
-        row_func = layout.row(align=True)
-        row_func.operator("bls.append_blend", text="Append Setup", icon="IMPORT")
+        col_func = layout.column(align=True)
+        col_func.prop(props, "lighting_type", text="Lighting Type", expand=False)
+        col_func.operator("bls.append_blend", text="Append Setup", icon="IMPORT")
 

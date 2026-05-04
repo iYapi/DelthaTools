@@ -54,18 +54,20 @@ class ExportLightingPresetOperator(bpy.types.Operator):
             parent_collection = o.users_collection[0].name if o.users_collection else "NoCollection"
 
             # Light data
-            col = tuple(float(c) for c in o.data.color[:3])
-            energy = float(o.data.energy)
-            exposure = float(o.data.exposure)
-            shadow_jitter_overblur = float(o.data.shadow_jitter_overblur)
-
-            by_collection[parent_collection].append({
+            data_dict = {
                 "name": o.name,
-                "color": col,
-                "energy": energy,
-                "exposure": exposure,
-                "shadow_jitter_overblur": shadow_jitter_overblur,
-            })
+                "color": tuple(float(c) for c in o.data.color[:3]),
+                "energy": float(o.data.energy),
+                "exposure": float(o.data.exposure),
+                "shadow_jitter_overblur": float(o.data.shadow_jitter_overblur),
+            }
+
+            # Add angle specifically for Sun lights
+            if o.data.type == 'SUN':
+                data_dict["angle"] = float(o.data.angle)
+
+            by_collection[parent_collection].append(data_dict)
+            
 
         payload = [{"collection": cname, "preset": items} for cname, items in by_collection.items()]
 
@@ -152,6 +154,11 @@ class ImportLightingPresetOperator(bpy.types.Operator):
                 light_data.energy = item.get("energy", 10.0)
                 light_data.exposure = item.get("exposure", 0.0)
                 light_data.shadow_jitter_overblur = item.get("shadow_jitter_overblur", 0.0)
+
+                # Apply Angle if the light is a Sun and the data exists in the JSON
+                if light_data.type == 'SUN' and "angle" in item:
+                    light_data.angle = item.get("angle", 0.009269) # Default ~0.53 degrees
+
                 applied += 1
 
         return {'FINISHED'}

@@ -1,7 +1,7 @@
 # Quick Open Graph Window
 
 **Kategori:** Animator Tool
-**Tool:** ExToolbox → GraphNewWindow
+**Tool:** DelthλTools → GraphNewWindow
 
 ---
 
@@ -15,17 +15,17 @@ Tool **Quick Open Graph Window** digunakan untuk membuka **Graph Editor** di jen
 
 Sebelum menggunakan tool ini, pastikan:
 
-- ExToolbox sudah terpasang dan aktif di 3D Viewport
+- DelthλTools sudah terpasang dan aktif di 3D Viewport
 
 ---
 
 ## Cara Penggunaan
 
-### Langkah 1 — Buka ExToolbox & Pilih Mode
+### Langkah 1 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `GraphNewWindow`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `GraphNewWindow`.
 
-![Pilih mode GraphNewWindow di ExToolbox](../images/quick-graph-window-step-01.jpeg)
+![Pilih mode GraphNewWindow di DelthλTools](../images/quick-graph-window-step-01.jpeg)
 
 ---
 
@@ -64,4 +64,4 @@ Jendela Graph Editor baru kini siap digunakan. Layout workspace utama tidak beru
 Ini bisa terjadi jika sistem tidak menemukan area yang bisa dikonversi. Coba tutup jendela tersebut dan klik tombol lagi.
 
 **Tombol tidak muncul?**
-Pastikan mode yang dipilih di ExToolbox adalah `GraphNewWindow`.
+Pastikan mode yang dipilih di DelthλTools adalah `GraphNewWindow`.

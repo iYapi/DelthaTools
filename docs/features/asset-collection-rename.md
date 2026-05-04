@@ -1,7 +1,7 @@
 # Asset Collection Rename
 
 **Kategori:** Asset Tool  
-**Tool:** ExToolbox → AssetColRename
+**Tool:** DelthλTools → AssetColRename
 
 ---
 
@@ -21,7 +21,7 @@ Sebelum menggunakan tool ini, pastikan:
 
 - Project sudah dibuka di Blender
 - **Nama file project sama dengan nama collection** yang ingin di-rename
-- ExToolbox sudah terpasang dan aktif di 3D Viewport
+- DelthλTools sudah terpasang dan aktif di 3D Viewport
 
 ---
 
@@ -35,11 +35,11 @@ Buka project dan pastikan nama file project **sama persis** dengan nama collecti
 
 ---
 
-### Langkah 2 — Buka ExToolbox & Pilih Mode
+### Langkah 2 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (biasanya di sidebar `N`). Kemudian ubah **Select Mode** menjadi `AssetColRename`.
+Di **3D Viewport**, buka panel **DelthλTools** (biasanya di sidebar `N`). Kemudian ubah **Select Mode** menjadi `AssetColRename`.
 
-![Memilih mode AssetColRename di ExToolbox](../images/photo_2026-04-06%2013.52.27.jpeg)
+![Memilih mode AssetColRename di DelthλTools](../images/photo_2026-04-06%2013.52.27.jpeg)
 
 ---
 
@@ -79,4 +79,4 @@ Pastikan nama file project dan nama collection sudah identik (case-sensitive).
 Ini tidak seharusnya terjadi. Jika ada, periksa apakah objek rig sudah diberi naming convention yang benar (misal prefix `RIG_`).
 
 **Tombol "Replace Asset Name" tidak muncul?**  
-Pastikan mode yang dipilih di ExToolbox adalah `AssetColRename`, bukan mode lainnya.
+Pastikan mode yang dipilih di DelthλTools adalah `AssetColRename`, bukan mode lainnya.

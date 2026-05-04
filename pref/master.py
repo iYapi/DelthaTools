@@ -15,6 +15,8 @@ class Toolbox(bpy.types.PropertyGroup):
             ('ANIM_PLAYBLAST', "AnimPlayblast", "Animation playblast tools"),
             ('IMG_WIN_PATH', "ImgWinPath", "Image path management tools"),
             ('ASSET_COL_RENAME', "AssetColRename", "Asset collection rename tools"),
+            ('IMPORT_VFX_PLANE', "ImportVfxPlane", "Import movie or image sequence as plane with correct settings"),
+            ('PROXYFY', "Proxyfy", "I don't know")
         ],
         default='INFO',
     )
@@ -25,7 +27,7 @@ class Toolbox(bpy.types.PropertyGroup):
     )
     version: bpy.props.StringProperty(
         name="Version",
-        default="0.2.3",
+        default="0.2.6",
         options={'HIDDEN'}
     )
 

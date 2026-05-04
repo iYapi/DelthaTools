@@ -5,12 +5,12 @@ import bpy
 # ExConfig UI
 # ------------------------------------------------------------------------
 class ExConfig_PT_Panel(bpy.types.Panel):
-    bl_label = "ExConfig"
+    bl_label = "DelthλConfig"
     bl_idname = "EXCONFIG_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'ExToolbox'
-    bl_description = "ExConfig panel for MasterX Tools"
+    bl_category = 'DelthλTools'
+    bl_description = "DelthλTools Config panel"
 
     @classmethod
     def poll(cls, context):
@@ -25,7 +25,7 @@ class ExConfig_PT_Panel(bpy.types.Panel):
         
         # Header row with title and refresh button
         row = col.row(align=True)
-        row.label(text="ExConfig Settings.", icon='PREFERENCES')
+        row.label(text="DelthλConfig Settings.", icon='PREFERENCES')
         row.operator("exconfig.refresh_data", text="", icon='FILE_REFRESH')
         
         col.prop(s.exconfig, "project_list", text="Project")

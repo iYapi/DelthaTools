@@ -1,22 +1,22 @@
 # Animation Playblast Render
 
 **Kategori:** Animator Tool
-**Tool:** ExToolbox → AnimPlayblast
+**Tool:** DelthλTools → AnimPlayblast
 
 ---
 
 ## Deskripsi
 
-Tool **Animation Playblast Render** digunakan untuk merender preview animasi (playblast) secara cepat langsung dari Blender. Tool ini otomatis menerapkan preset render, mengatur output path berdasarkan pola project yang telah dikonfigurasi di ExConfig, lalu merender menggunakan OpenGL renderer.
+Tool **Animation Playblast Render** digunakan untuk merender preview animasi (playblast) secara cepat langsung dari Blender. Tool ini otomatis menerapkan preset render, mengatur output path berdasarkan pola project yang telah dikonfigurasi di DelthλConfig, lalu merender menggunakan OpenGL renderer.
 
 Fitur utama:
 - Render berdasarkan **Render Marker** (`EX_START` dan `EX_END`) jika tersedia, atau menggunakan frame range scene
 - Otomatis switch ke **Camera View** saat render berlangsung
 - Viewport otomatis menggunakan mode **Solid + Texture** saat render
 - Otomatis kembali ke mode **Solid + Material** setelah render selesai
-- Output path digenerate secara otomatis dari konfigurasi ExConfig
+- Output path digenerate secara otomatis dari konfigurasi DelthλConfig
 
-> **Catatan:** Tool ini membutuhkan konfigurasi ExConfig (pattern Animation & Playblast) sebelum dapat digunakan.
+> **Catatan:** Tool ini membutuhkan konfigurasi DelthλConfig (pattern Animation & Playblast) sebelum dapat digunakan.
 
 ---
 
@@ -25,19 +25,19 @@ Fitur utama:
 Sebelum menggunakan tool ini, pastikan:
 
 - File Blender sudah disimpan
-- ExConfig sudah dikonfigurasi dengan pattern **Animation** dan **Playblast**
+- DelthλConfig sudah dikonfigurasi dengan pattern **Animation** dan **Playblast**
 - Terdapat **camera** di scene
-- ExToolbox sudah terpasang dan aktif di 3D Viewport
+- DelthλTools sudah terpasang dan aktif di 3D Viewport
 
 ---
 
 ## Cara Penggunaan
 
-### Langkah 1 — Buka ExToolbox & Pilih Mode
+### Langkah 1 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `AnimPlayblast`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `AnimPlayblast`.
 
-![Pilih mode AnimPlayblast di ExToolbox](../images/photo_2026-04-06%2014.21.24.jpeg)
+![Pilih mode AnimPlayblast di DelthλTools](../images/photo_2026-04-06%2014.21.24.jpeg)
 
 ---
 
@@ -64,7 +64,7 @@ Klik tombol **"Add Safe Area"** untuk menampilkan overlay safe area di camera. I
 Klik tombol **"Render Playblast"** untuk memulai proses render.
 
 Tool akan secara otomatis:
-1. Menerapkan preset render dari ExConfig
+1. Menerapkan preset render dari DelthλConfig
 2. Menentukan frame range (dari marker `EX_START`/`EX_END` jika ada)
 3. Mengatur output path sesuai pola project
 4. Merender dengan OpenGL renderer
@@ -77,7 +77,7 @@ Tool akan secara otomatis:
 
 ### Langkah 5 — Verifikasi Output
 
-Setelah render selesai, cek folder output yang dikonfigurasi di ExConfig. File video playblast sudah tersimpan di path yang ditentukan.
+Setelah render selesai, cek folder output yang dikonfigurasi di DelthλConfig. File video playblast sudah tersimpan di path yang ditentukan.
 
 ---
 
@@ -87,7 +87,7 @@ Setelah render selesai, cek folder output yang dikonfigurasi di ExConfig. File v
 |---|---|
 | Renderer | OpenGL (viewport render) |
 | Frame range | Dari marker `EX_START`/`EX_END`, fallback ke frame_start/frame_end scene |
-| Output path | Digenerate otomatis dari ExConfig (pattern Animation + Playblast) |
+| Output path | Digenerate otomatis dari DelthλConfig (pattern Animation + Playblast) |
 | Viewport shading | Otomatis SOLID + TEXTURE saat render, kembali SOLID + MATERIAL setelah selesai |
 | Render marker | Dihapus otomatis setelah render selesai |
 | Safe area | Menggunakan image overlay dari `/mnt/J/00_tools/cam_guide/action-safe_nowm.png` |
@@ -103,10 +103,10 @@ Pastikan scene memiliki camera aktif. Tambahkan camera dan jadikan camera aktif 
 Simpan file Blender terlebih dahulu sebelum menjalankan Render Playblast.
 
 **Error "Animation and/or Playblast patterns not configured"?**
-Buka panel **ExConfig** dan konfigurasi pattern **Animation** dan **Playblast** terlebih dahulu.
+Buka panel **DelthλConfig** dan konfigurasi pattern **Animation** dan **Playblast** terlebih dahulu.
 
 **Error "No playblast config path set"?**
-Di panel ExConfig → Playblast Config, pastikan path ke file preset JSON sudah diisi.
+Di panel DelthλConfig → Playblast Config, pastikan path ke file preset JSON sudah diisi.
 
 **Output path salah atau tidak terbuat?**
-Cek konfigurasi Pattern Match `animation_playblast` di ExConfig → Pattern Match panel.
+Cek konfigurasi Pattern Match `animation_playblast` di DelthλConfig → Pattern Match panel.

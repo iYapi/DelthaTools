@@ -1,7 +1,7 @@
 # Fix Image Windows Path
 
 **Kategori:** Asset Tool
-**Tool:** ExToolbox → ImgWinPath
+**Tool:** DelthλTools → ImgWinPath
 
 ---
 
@@ -21,17 +21,17 @@ Sebelum menggunakan tool ini, pastikan:
 
 - Project sudah dibuka dan **disimpan** di Blender
 - Terdapat image yang pathnya putus (missing) akibat perpindahan sistem operasi atau drive
-- ExToolbox sudah terpasang dan aktif di 3D Viewport
+- DelthλTools sudah terpasang dan aktif di 3D Viewport
 
 ---
 
 ## Cara Penggunaan
 
-### Langkah 1 — Buka ExToolbox & Pilih Mode
+### Langkah 1 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `ImgWinPath`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `ImgWinPath`.
 
-![Pilih mode ImgWinPath di ExToolbox](../images/fix-image-windows-path-step-01.jpeg)
+![Pilih mode ImgWinPath di DelthλTools](../images/fix-image-windows-path-step-01.jpeg)
 
 ---
 
@@ -74,4 +74,4 @@ Path mungkin bukan format `A:\`. Tool ini khusus mengonversi path drive `A:`. Un
 Simpan file Blender terlebih dahulu sebelum menjalankan tool ini.
 
 **Tombol tidak muncul?**
-Pastikan mode yang dipilih di ExToolbox adalah `ImgWinPath`.
+Pastikan mode yang dipilih di DelthλTools adalah `ImgWinPath`.

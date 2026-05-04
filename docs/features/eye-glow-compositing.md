@@ -1,7 +1,7 @@
 # Eye Glow Compositing
 
 **Kategori:** Lighting, Compositing & Render Tool
-**Tool:** ExToolbox → EyeGlowCompositing
+**Tool:** DelthλTools → EyeGlowCompositing
 
 ---
 
@@ -23,8 +23,8 @@ Sebelum menggunakan tool ini, pastikan:
 
 - Scene sudah memiliki render layer dengan **CryptoMaterial** pass aktif (layer: `Comp.CryptoMaterial`)
 - Material mata pada karakter menggunakan nama yang diawali dengan `eyes` (sesuai matte ID)
-- File preset blend yang berisi node group `Eye_Glow_Setup` sudah dikonfigurasi di panel ExToolbox
-- ExToolbox sudah terpasang dan aktif
+- File preset blend yang berisi node group `Eye_Glow_Setup` sudah dikonfigurasi di panel DelthλTools
+- DelthλTools sudah terpasang dan aktif
 
 ---
 
@@ -40,11 +40,11 @@ Di **Properties → View Layer → Passes → Cryptomatte**, aktifkan **Cryptoma
 
 ---
 
-### Langkah 2 — Buka ExToolbox & Pilih Mode
+### Langkah 2 — Buka DelthλTools & Pilih Mode
 
-Di **3D Viewport**, buka panel **ExToolbox** (sidebar `N`). Ubah **Select Mode** menjadi `EyeGlowCompositing`.
+Di **3D Viewport**, buka panel **DelthλTools** (sidebar `N`). Ubah **Select Mode** menjadi `EyeGlowCompositing`.
 
-![Pilih mode EyeGlowCompositing di ExToolbox](../images/eye-glow-step-02.jpeg)
+![Pilih mode EyeGlowCompositing di DelthλTools](../images/eye-glow-step-02.jpeg)
 
 ---
 

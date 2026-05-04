@@ -1,10 +1,10 @@
-# ExToolbox
+# DelthλTools
 
 **Blender addon** berisi kumpulan tool produksi untuk Asset, Animator, dan Lighting/Compositing/Render.
 
 - **Versi:** 0.2.3
 - **Blender:** 4.5.0+
-- **Author:** MrYapikZ
+- **Author:** Yapi
 
 ---
 
@@ -36,15 +36,15 @@
 1. Download atau clone repository ini
 2. Di Blender, buka **Edit → Preferences → Add-ons → Install**
 3. Pilih folder root project ini (atau file `.zip` jika sudah dikemas)
-4. Aktifkan addon **ExToolbox**
-5. Buka **3D Viewport → Sidebar (N) → ExToolbox**
+4. Aktifkan addon **DelthλTools**
+5. Buka **3D Viewport → Sidebar (N) → DelthλTools**
 
 ---
 
 ## Struktur Project
 
 ```
-ExToolbox/
+DelthaTools/
 ├── __init__.py          # Entry point addon, bl_info
 ├── ops/                 # Operator (logika tool)
 │   ├── AnimPlayblast/

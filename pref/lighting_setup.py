@@ -8,8 +8,17 @@ class LIGHTINGSETUP(bpy.types.PropertyGroup):
     filepath: bpy.props.StringProperty(
         name="File Path",
         description="Path to the blend file to append from",
-        default="presets/blend/lighting_setup.blend",
+        default="presets/blend/scene_presets.blend",
         subtype='FILE_PATH'
+    )
+    lighting_type: bpy.props.EnumProperty(
+        name="Lighting Type",
+        description="Setup lighting presets",
+        items=[
+            ('LIGHTCHAR', "LightChar", "2 area light rim & fill"),
+            ('SPLITKEY', "SplitKey", "Global key light")
+        ],
+        default='LIGHTCHAR'
     )
 
 

@@ -1,5 +1,5 @@
 from . import LightingProperties, LightingSetup, GraphNewWindow, EyeGlowCompositing, AnimPlayblast, ExConfig, \
-    ImgWinPath, ExLauncher, AssetColRename
+    ImgWinPath, ExLauncher, AssetColRename, ImportVfxPlane, Proxyfy
 
 modules = [
     ExConfig,
@@ -10,7 +10,9 @@ modules = [
     EyeGlowCompositing,
     AnimPlayblast,
     ImgWinPath,
-    AssetColRename
+    AssetColRename,
+    ImportVfxPlane,
+    Proxyfy
 ]
 
 
