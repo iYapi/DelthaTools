@@ -245,6 +245,20 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
         if not filepath:
             self.report({'ERROR'}, "No presets file path specified")
             return {'CANCELLED'}
+        
+        def add_lightgroup(name):
+            for view_layer in bpy.data.scenes['Scene'].view_layers:
+
+                if any(lg.name == name for lg in view_layer.lightgroups):
+                    self.report({'INFO'}, f"[SKIP] '{name}' already exist in view layer '{view_layer.name}'")
+                    continue
+
+                layer = view_layer
+
+                lg = layer.lightgroups.add()
+                lg.name = name
+
+                self.report({'INFO'}, f"Light group '{name}' created!")
 
         # ----------------------------------------------------------------
         # SPLITKEY
@@ -315,6 +329,18 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                 self.report({'INFO'}, f"Renamed {renamed_count} object(s) to include _{'global'}.")
             else:
                 self.report({'INFO'}, f"No object names needed _{'global'} (already suffixed or none found).")
+            
+            ## Set up lighting group
+            add_lightgroup("lg-key_diffuse_midtone_global")
+            add_lightgroup("lg-key_diffuse_global")
+            add_lightgroup("lg-key_glossy_Highlight_global")
+            bpy.data.objects["l-key_diffuse_midtone_global"].lightgroup = "lg-key_diffuse_midtone_global"
+            bpy.data.objects["l-key_diffuse_global"].lightgroup = "lg-key_diffuse_global"
+            bpy.data.objects["l-key_glossy_Highlight_global"].lightgroup = "lg-key_glossy_Highlight_global"
+            
+            lightgroup_world = "lg-world_light"
+            add_lightgroup(lightgroup_world)
+            bpy.data.worlds["World"].lightgroup = lightgroup_world
 
             self.report({'INFO'}, f"Appended {new_col.name} from {target_scene_name}")
             return {'FINISHED'}
@@ -483,6 +509,12 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                     self.report({'INFO'}, f"Added '{sel_name}' to shared receiver '{shared_rcv.name}'.")
                 else:
                     self.report({'INFO'}, f"'{sel_name}' already present in shared receiver '{shared_rcv.name}'.")
+                    
+            ## Set up light group for fill and rim lights
+            add_lightgroup(f"lg-rim_light_{suffix}")
+            add_lightgroup(f"lg-fill_light_{suffix}")
+            bpy.data.objects[f"l-rim_light_{suffix}"].lightgroup = f"lg-rim_light_{suffix}"
+            bpy.data.objects[f"l-fill_light_{suffix}"].lightgroup = f"lg-fill_light_{suffix}"
 
             rig.data.pose_position = 'POSE'
             self.report({'INFO'}, f"Lighting setup appended into 'LightingSetup' as 'rf-{suffix}'.")
