@@ -9,16 +9,20 @@ class Toolbox(bpy.types.PropertyGroup):
         name="Mode",
         description="Choose which tool page to display",
         items=[
-            ('INFO', "Info", "Information about the addon"),
-            ('LIGHTING_PROPERTIES', "LightingProperties", "Lighting override controls"),
-            ('LIGHTING_SETUP', "LightingSetup", "Lighting setup tools"),
-            ('ANIM_PLAYBLAST', "AnimPlayblast", "Animation playblast tools"),
-            ('IMG_WIN_PATH', "ImgWinPath", "Image path management tools"),
-            ('ASSET_COL_RENAME', "AssetColRename", "Asset collection rename tools"),
-            ('IMPORT_VFX_PLANE', "ImportVfxPlane", "Import movie or image sequence as plane with correct settings"),
-            ('PROXYFY', "Proxyfy", "I don't know")
+            ("INFO", "Info", "Information about the addon"),
+            ("LIGHTING_PROPERTIES", "LightingProperties", "Lighting override controls"),
+            ("LIGHTING_SETUP", "LightingSetup", "Lighting setup tools"),
+            ("ANIM_PLAYBLAST", "AnimPlayblast", "Animation playblast tools"),
+            ("IMG_WIN_PATH", "ImgWinPath", "Image path management tools"),
+            ("ASSET_COL_RENAME", "AssetColRename", "Asset collection rename tools"),
+            (
+                "IMPORT_VFX_PLANE",
+                "ImportVfxPlane",
+                "Import movie or image sequence as plane with correct settings",
+            ),
+            ("PROXYFY", "Proxyfy", "I don't know"),
         ],
-        default='INFO',
+        default="INFO",
     )
     show_exconfig: bpy.props.BoolProperty(
         name="Show ExConfig Options",
@@ -26,20 +30,23 @@ class Toolbox(bpy.types.PropertyGroup):
         default=False,
     )
     version: bpy.props.StringProperty(
-        name="Version",
-        default="0.2.6",
-        options={'HIDDEN'}
+        name="Version", default="0.2.7", options={"HIDDEN"}
     )
+
 
 class ToolboxCompositing(bpy.types.PropertyGroup):
     ui_mode: bpy.props.EnumProperty(
         name="Mode",
         description="Choose which tool page to display",
         items=[
-            ('INFO', "Info", "Information about the addon"),
-            ('EYE_GLOW_COMPOSITING', "EyeGlowCompositing", "Eye glow compositing tools"),
+            ("INFO", "Info", "Information about the addon"),
+            (
+                "EYE_GLOW_COMPOSITING",
+                "EyeGlowCompositing",
+                "Eye glow compositing tools",
+            ),
         ],
-        default='INFO',
+        default="INFO",
     )
 
 
@@ -47,7 +54,9 @@ def register():
     bpy.utils.register_class(Toolbox)
     bpy.utils.register_class(ToolboxCompositing)
     bpy.types.Scene.toolbox = bpy.props.PointerProperty(type=Toolbox)
-    bpy.types.Scene.toolbox_compositing = bpy.props.PointerProperty(type=ToolboxCompositing)
+    bpy.types.Scene.toolbox_compositing = bpy.props.PointerProperty(
+        type=ToolboxCompositing
+    )
 
 
 def unregister():
