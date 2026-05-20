@@ -706,6 +706,16 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                 self.report(
                     {"WARNING"}, f"Failed to append scene '{source_scene_name}'"
                 )
+
+            filename = bpy.data.filepath.split("\\")[-1].split("/")[-1]
+            if "." in filename:
+                filename = filename.rsplit(".", 1)[0]
+
+            new_collection = bpy.data.collections.new(filename)
+
+            bpy.context.scene.collection.children.link(new_collection)
+            self.report({"INFO"}, f"Collection {filename} created!")
+            return {"FINISHED"}
         return {"CANCELLED"}
 
 
@@ -715,4 +725,3 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(LIGHTINGSETUP_OT_AppendBlend)
-
