@@ -1,3 +1,4 @@
+from os import kill
 import bpy, re, mathutils
 from ...utils.file_manager import FileManager
 from .set_child_of_bone_popup import CUSTOM_BONE_NAME
@@ -660,52 +661,74 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
             )
             return {"FINISHED"}
 
-        elif props.lighting_type == "ASSETBASE":
-            source_scene_name = "AssetBase"
-            target_scene_name = "Scene"
+        elif props.lighting_type == "ASSETBASECYCLES":
+            source_scene_name = "AssetBaseCycles"
 
-            # Load the specific scene data from source
             with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
-                # Only load the specific scene "AssetBase"
                 if source_scene_name in data_from.scenes:
                     data_to.scenes = [source_scene_name]
-                    # Also load all objects and collections to ensure complete scene
-                    data_to.objects = data_from.objects
-                    data_to.collections = data_from.collections
-                    self.report(
-                        {"INFO"}, f"Loading scene '{source_scene_name}' from {filepath}"
-                    )
                 else:
                     self.report(
-                        {"WARNING"},
-                        f"Error: Scene '{source_scene_name}' not found in {filepath}",
+                        {"ERROR"}, f"Error: Scene '{source_scene_name}' not found"
                     )
                     self.report({"INFO"}, f"Available scenes: {data_from.scenes}")
                     exit()
 
-            # Find the newly appended scene (should be "AssetBase")
-            appended_scene = bpy.data.scenes.get(source_scene_name)
+            asset_scene = bpy.data.scenes.get(source_scene_name)
 
-            if appended_scene:
-                # Switch to the appended scene
-                bpy.context.window.scene = appended_scene
+            if asset_scene:
+                collection_names = []
+                for collection in asset_scene.collection.children:
+                    collection_names.append(collection.name)
+                    self.report(
+                        {"INFO"},
+                        f"Found root collection in '{source_scene_name}': {collection.name}",
+                    )
 
-                # Delete the old target scene if it exists
-                if target_scene_name in bpy.data.scenes:
-                    old_scene = bpy.data.scenes[target_scene_name]
-                    bpy.data.scenes.remove(old_scene)
-                    self.report({"INFO"}, f"Removed old scene: '{target_scene_name}'")
-
-                # Rename the appended scene to target name
-                appended_scene.name = target_scene_name
                 self.report(
                     {"INFO"},
-                    f"Successfully replaced '{target_scene_name}' with '{source_scene_name}'",
+                    f"Found collections in '{source_scene_name}': {collection_names}",
+                )
+
+                world_name = asset_scene.world.name if asset_scene.world else None
+
+                bpy.data.scenes.remove(asset_scene)
+
+                with bpy.data.libraries.load(filepath, link=False) as (
+                    data_from,
+                    data_to,
+                ):
+                    data_to.collections = [
+                        coll
+                        for coll in data_from.collections
+                        if coll in collection_names
+                    ]
+
+                    if world_name and world_name in data_from.worlds:
+                        data_to.worlds = [world_name]
+                    else:
+                        data_to.worlds = data_from.worlds
+
+                for collection in data_to.collections:
+                    if collection is not None:
+                        if collection.name not in bpy.context.scene.collection.children:
+                            bpy.context.scene.collection.children.link(collection)
+                            self.report(
+                                {"INFO"}, f"Linked collection: {collection.name}"
+                            )
+
+                if data_to.worlds:
+                    world = data_to.worlds[0]
+                    if world is not None:
+                        bpy.context.scene.world = world
+                        self.report({"INFO"}, f"Set world: {world.name}")
+
+                self.report(
+                    {"INFO"},
+                    f"Successfully appended collections and world from '{source_scene_name}'",
                 )
             else:
-                self.report(
-                    {"WARNING"}, f"Failed to append scene '{source_scene_name}'"
-                )
+                self.report({"WARNING"}, f"Could not load scene '{source_scene_name}'")
 
             filename = bpy.data.filepath.split("\\")[-1].split("/")[-1]
             if "." in filename:
@@ -715,6 +738,64 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
 
             bpy.context.scene.collection.children.link(new_collection)
             self.report({"INFO"}, f"Collection {filename} created!")
+
+            current_scene = bpy.context.scene
+            # Render Engine
+            current_scene.render.engine = "CYCLES"
+            current_scene.cycles.feature_set = "SUPPORTED"
+            current_scene.cycles.device = "GPU"
+
+            # Sampling Viewport
+            current_scene.cycles.use_preview_adaptive_sampling = True
+            current_scene.cycles.preview_adaptive_threshold = 0.01
+            current_scene.cycles.preview_samples = 128
+            current_scene.cycles.preview_adaptive_min_samples = 16
+
+            # Sampling Viewport Denoise
+            current_scene.cycles.use_preview_denoising = True
+            current_scene.cycles.preview_denoiser = "OPENIMAGEDENOISE"
+            current_scene.cycles.preview_denoising_input_passes = "RGB"
+            current_scene.cycles.preview_denoising_prefilter = "FAST"
+            current_scene.cycles.preview_denoising_quality = "FAST"
+            current_scene.cycles.preview_denoising_start_sample = 1
+            current_scene.cycles.preview_denoising_use_gpu = True
+
+            # Sampling Render
+            current_scene.cycles.use_adaptive_sampling = True
+            current_scene.cycles.adaptive_threshold = 0.01
+            current_scene.cycles.samples = 256
+            current_scene.cycles.adaptive_min_samples = 16
+            current_scene.cycles.time_limit = 0
+
+            # Sampling Render Denoise
+            current_scene.cycles.use_denoising = True
+            current_scene.cycles.denoiser = "OPENIMAGEDENOISE"
+            current_scene.cycles.denoising_input_passes = "RGB_ALBEDO_NORMAL"
+            current_scene.cycles.denoising_prefilter = "ACCURATE"
+            current_scene.cycles.denoising_quality = "HIGH"
+            current_scene.cycles.denoising_use_gpu = True
+
+            # Simplify
+            current_scene.render.use_simplify = True
+            current_scene.render.simplify_subdivision = 2
+            current_scene.render.simplify_child_particles = 1
+            current_scene.cycles.texture_limit = "2048"
+            current_scene.render.simplify_volumes = 1
+            current_scene.render.use_simplify_normals = False
+            current_scene.render.simplify_subdivision_render = 2
+            current_scene.render.simplify_child_particles_render = (
+                1  # Fixed: changed == to =
+            )
+            current_scene.cycles.texture_limit_render = "2048"
+
+            # Color Management
+            current_scene.display_settings.display_device = "sRGB"
+            current_scene.view_settings.view_transform = "ARRI K1S1"
+            current_scene.view_settings.look = "None"
+            current_scene.view_settings.exposure = 0
+            current_scene.view_settings.gamma = 1
+            current_scene.sequencer_colorspace_settings.name = "sRGB"
+            self.report({"INFO"}, "Raw cycles asset config applied")
             return {"FINISHED"}
         return {"CANCELLED"}
 
