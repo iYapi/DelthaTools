@@ -17,7 +17,8 @@ class LIGHTINGSETUP(bpy.types.PropertyGroup):
         items=[
             ("LIGHTCHAR", "LightChar", "2 area light rim & fill"),
             ("SPLITKEY", "SplitKey", "Global key light"),
-            ("ASSETBASE", "AssetBase", "Asset base scene"),
+            ("ASSETBASECYCLES", "AssetBase(Cycles)", "Asset base scene (Cycles)"),
+            ("ASSETBASEEEVEE", "AssetBase(Eevee)", "Asset base scene (Eevee)"),
         ],
         default="LIGHTCHAR",
     )
