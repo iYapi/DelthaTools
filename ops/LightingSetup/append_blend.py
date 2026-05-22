@@ -410,6 +410,10 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
             bpy.data.worlds["World"].lightgroup = lightgroup_world
 
             self.report({"INFO"}, f"Appended {new_col.name} from {target_scene_name}")
+
+            bpy.ops.outliner.orphans_purge(
+                do_local_ids=True, do_linked_ids=True, do_recursive=True
+            )
             return {"FINISHED"}
 
         # ----------------------------------------------------------------
@@ -659,10 +663,15 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                 {"INFO"},
                 f"Lighting setup appended into 'LightingSetup' as 'rf-{suffix}'.",
             )
+
+            bpy.ops.outliner.orphans_purge(
+                do_local_ids=True, do_linked_ids=True, do_recursive=True
+            )
             return {"FINISHED"}
 
         elif props.lighting_type == "ASSETBASECYCLES":
             source_scene_name = "AssetBaseCycles"
+            specific_worlds = ["INT_Studio_Cycles", "EXT_Day_Cycles"]
 
             with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
                 if source_scene_name in data_from.scenes:
@@ -690,25 +699,36 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                     f"Found collections in '{source_scene_name}': {collection_names}",
                 )
 
-                world_name = asset_scene.world.name if asset_scene.world else None
-
                 bpy.data.scenes.remove(asset_scene)
 
+                # SINGLE LIBRARY LOAD FOR BOTH COLLECTIONS AND ALL WORLDS
                 with bpy.data.libraries.load(filepath, link=False) as (
                     data_from,
                     data_to,
                 ):
+                    # Load collections
                     data_to.collections = [
                         coll
                         for coll in data_from.collections
                         if coll in collection_names
                     ]
 
-                    if world_name and world_name in data_from.worlds:
-                        data_to.worlds = [world_name]
-                    else:
-                        data_to.worlds = data_from.worlds
+                    # Load ALL worlds in one go (original + specific worlds)
+                    worlds_to_load = set()
 
+                    # Add specific worlds
+                    for specific_world in specific_worlds:
+                        if specific_world in data_from.worlds:
+                            worlds_to_load.add(specific_world)
+
+                    # Convert set back to list for loading
+                    data_to.worlds = list(worlds_to_load)
+                    self.report(
+                        {"INFO"},
+                        f"Loading {len(worlds_to_load)} worlds: {worlds_to_load}",
+                    )
+
+                # Link collections
                 for collection in data_to.collections:
                     if collection is not None:
                         if collection.name not in bpy.context.scene.collection.children:
@@ -716,16 +736,31 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
                             self.report(
                                 {"INFO"}, f"Linked collection: {collection.name}"
                             )
+                        else:
+                            self.report(
+                                {"INFO"},
+                                f"Collection already linked: {collection.name}",
+                            )
 
+                # Set active world (prioritize specific worlds)
                 if data_to.worlds:
-                    world = data_to.worlds[0]
-                    if world is not None:
-                        bpy.context.scene.world = world
-                        self.report({"INFO"}, f"Set world: {world.name}")
+                    active_world = None
+                    for specific_world in specific_worlds:
+                        if specific_world in bpy.data.worlds:
+                            active_world = bpy.data.worlds[specific_world]
+                            active_world.use_fake_user = True
+                            self.report(
+                                {"INFO"},
+                                f"Set fake user for world: {active_world.name}",
+                            )
+
+                    if active_world:
+                        bpy.context.scene.world = active_world
+                        self.report({"INFO"}, f"Set world: {active_world.name}")
 
                 self.report(
                     {"INFO"},
-                    f"Successfully appended collections and world from '{source_scene_name}'",
+                    f"Successfully appended collections and {len(data_to.worlds)} worlds from '{source_scene_name}'",
                 )
             else:
                 self.report({"WARNING"}, f"Could not load scene '{source_scene_name}'")
@@ -796,7 +831,211 @@ class LIGHTINGSETUP_OT_AppendBlend(bpy.types.Operator):
             current_scene.view_settings.gamma = 1
             current_scene.sequencer_colorspace_settings.name = "sRGB"
             self.report({"INFO"}, "Raw cycles asset config applied")
+
+            bpy.ops.outliner.orphans_purge(
+                do_local_ids=True, do_linked_ids=True, do_recursive=True
+            )
             return {"FINISHED"}
+
+        elif props.lighting_type == "ASSETBASEEEVEE":
+            source_scene_name = "AssetBaseEevee"
+            specific_worlds = ["INT_Studio_EEVEE", "EXT_Day_EEVEE"]
+
+            with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                if source_scene_name in data_from.scenes:
+                    data_to.scenes = [source_scene_name]
+                else:
+                    self.report(
+                        {"ERROR"}, f"Error: Scene '{source_scene_name}' not found"
+                    )
+                    self.report({"INFO"}, f"Available scenes: {data_from.scenes}")
+                    exit()
+
+            asset_scene = bpy.data.scenes.get(source_scene_name)
+
+            if asset_scene:
+                collection_names = []
+                for collection in asset_scene.collection.children:
+                    collection_names.append(collection.name)
+                    self.report(
+                        {"INFO"},
+                        f"Found root collection in '{source_scene_name}': {collection.name}",
+                    )
+
+                self.report(
+                    {"INFO"},
+                    f"Found collections in '{source_scene_name}': {collection_names}",
+                )
+
+                bpy.data.scenes.remove(asset_scene)
+
+                # SINGLE LIBRARY LOAD FOR BOTH COLLECTIONS AND ALL WORLDS
+                with bpy.data.libraries.load(filepath, link=False) as (
+                    data_from,
+                    data_to,
+                ):
+                    # Load collections
+                    data_to.collections = [
+                        coll
+                        for coll in data_from.collections
+                        if coll in collection_names
+                    ]
+
+                    # Load ALL worlds in one go (original + specific worlds)
+                    worlds_to_load = set()
+
+                    # Add specific worlds
+                    for specific_world in specific_worlds:
+                        if specific_world in data_from.worlds:
+                            worlds_to_load.add(specific_world)
+
+                    # Convert set back to list for loading
+                    data_to.worlds = list(worlds_to_load)
+                    self.report(
+                        {"INFO"},
+                        f"Loading {len(worlds_to_load)} worlds: {worlds_to_load}",
+                    )
+
+                # Link collections
+                for collection in data_to.collections:
+                    if collection is not None:
+                        if collection.name not in bpy.context.scene.collection.children:
+                            bpy.context.scene.collection.children.link(collection)
+                            self.report(
+                                {"INFO"}, f"Linked collection: {collection.name}"
+                            )
+                        else:
+                            self.report(
+                                {"INFO"},
+                                f"Collection already linked: {collection.name}",
+                            )
+
+                if data_to.worlds:
+                    active_world = None
+                    for specific_world in specific_worlds:
+                        if specific_world in bpy.data.worlds:
+                            active_world = bpy.data.worlds[specific_world]
+                            active_world.use_fake_user = True
+                            self.report(
+                                {"INFO"},
+                                f"Set fake user for world: {active_world.name}",
+                            )
+
+                    if active_world:
+                        bpy.context.scene.world = active_world
+                        self.report({"INFO"}, f"Set world: {active_world.name}")
+
+                self.report(
+                    {"INFO"},
+                    f"Successfully appended collections and {len(data_to.worlds)} worlds from '{source_scene_name}'",
+                )
+            else:
+                self.report({"WARNING"}, f"Could not load scene '{source_scene_name}'")
+
+            filename = bpy.data.filepath.split("\\")[-1].split("/")[-1]
+            if "." in filename:
+                filename = filename.rsplit(".", 1)[0]
+
+            new_collection = bpy.data.collections.new(filename)
+
+            bpy.context.scene.collection.children.link(new_collection)
+            self.report({"INFO"}, f"Collection {filename} created!")
+
+            current_scene = bpy.context.scene
+            # Render Engine
+            current_scene.render.engine = "BLENDER_EEVEE_NEXT"
+
+            # Sampling Viewport
+            current_scene.eevee.taa_samples = 32
+            current_scene.eevee.use_taa_reprojection = True
+            current_scene.eevee.use_shadow_jitter_viewport = True
+
+            # Sampling Render
+            current_scene.eevee.taa_render_samples = 64
+
+            # Sampling Shadows
+            current_scene.eevee.use_shadows = True
+            current_scene.eevee.shadow_ray_count = 1
+            current_scene.eevee.shadow_step_count = 6
+            current_scene.eevee.use_volumetric_shadows = True
+            current_scene.eevee.volumetric_shadow_samples = 16
+            current_scene.eevee.shadow_resolution_scale = 1
+
+            # Sampling Raytracing
+            current_scene.eevee.use_raytracing = True
+            current_scene.eevee.ray_tracing_method = "SCREEN"
+            current_scene.eevee.ray_tracing_options.resolution_scale = "1"
+
+            # Raytracing Screen Tracing
+            current_scene.eevee.ray_tracing_options.screen_trace_quality = 0.8
+            current_scene.eevee.ray_tracing_options.screen_trace_thickness = 0.2
+
+            # Raytracing Denoising
+            current_scene.eevee.ray_tracing_options.use_denoise = True
+            current_scene.eevee.ray_tracing_options.denoise_spatial = True
+            current_scene.eevee.ray_tracing_options.denoise_temporal = True
+            current_scene.eevee.ray_tracing_options.denoise_bilateral = True
+
+            # Raytracing Fast GI Approximation
+            current_scene.eevee.use_fast_gi = True
+            current_scene.eevee.ray_tracing_options.trace_max_roughness = 0.2
+            current_scene.eevee.fast_gi_method = "GLOBAL_ILLUMINATION"
+            current_scene.eevee.fast_gi_resolution = "4"
+            current_scene.eevee.fast_gi_ray_count = 1
+            current_scene.eevee.fast_gi_step_count = 8
+            current_scene.eevee.fast_gi_quality = 0.25
+            current_scene.eevee.fast_gi_distance = 0
+            current_scene.eevee.fast_gi_thickness_near = 0.25
+            current_scene.eevee.fast_gi_thickness_far = 0.0872664600610733
+
+            # Simplify
+            current_scene.render.use_simplify = True
+
+            # Simplify Viewport
+            current_scene.render.simplify_subdivision = 2
+            current_scene.render.simplify_child_particles = 1
+            current_scene.render.simplify_volumes = 1
+            current_scene.render.use_simplify_normals = False
+
+            # Simplify Render
+            current_scene.render.simplify_subdivision_render = 2
+            current_scene.render.simplify_child_particles_render = 1
+
+            # Performance Memory
+            current_scene.eevee.shadow_pool_size = "1024"
+            current_scene.eevee.gi_irradiance_pool_size = "16"
+
+            # Performance Compositor
+            current_scene.render.compositor_device = "GPU"
+            current_scene.render.compositor_precision = "FULL"
+
+            # Performance Denoise Nodes
+            current_scene.render.compositor_denoise_device = "GPU"
+            current_scene.render.compositor_denoise_preview_quality = "BALANCED"
+            current_scene.render.compositor_denoise_final_quality = "HIGH"
+
+            # Color Management
+            current_scene.display_settings.display_device = "sRGB"
+            current_scene.view_settings.view_transform = "ARRI K1S1"
+            current_scene.view_settings.look = "None"
+            current_scene.view_settings.exposure = 0
+            current_scene.view_settings.gamma = 1
+            current_scene.sequencer_colorspace_settings.name = "sRGB"
+
+            # Loop untuk seluruh screen biar di set ke "ALWAYS"
+            for screen in bpy.data.screens:
+                for area in screen.areas:
+                    if area.type == "VIEW_3D":
+                        for space in area.spaces:
+                            if space.type == "VIEW_3D":
+                                space.shading.use_compositor = "ALWAYS"
+            self.report({"INFO"}, "Raw eevee asset config applied")
+
+            bpy.ops.outliner.orphans_purge(
+                do_local_ids=True, do_linked_ids=True, do_recursive=True
+            )
+            return {"FINISHED"}
+
         return {"CANCELLED"}
 
 
