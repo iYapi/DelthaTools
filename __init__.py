@@ -2,8 +2,8 @@ bl_info = {
     "name": "DelthλTools",
     "description": "Tools for Blender",
     "author": "Yapi",
-    "version": (0, 2, 14),
-    "blender": (4, 5, 0),
+    "version": (0, 3, 0),
+    "blender": (5, 2, 0),
 }
 
 import bpy, os
