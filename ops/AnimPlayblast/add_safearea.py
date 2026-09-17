@@ -47,6 +47,7 @@ class APB_OT_AddSafeArea(bpy.types.Operator):
             bg.display_depth = 'FRONT'
             bg.scale = 1.0
             bg.alpha = 1.0
+            bg.frame_method = 'STRETCH'
 
             img = bpy.data.images[img_name]
             img.pack()
